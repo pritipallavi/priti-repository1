@@ -15,20 +15,18 @@
 # limitations under the License.
 #
 import webapp2
-from models.heart import Heart
+from models.organization import Organization
+
 
 class PulseHandler(webapp2.RequestHandler):
     def get(self):
 
         id = self.request.get_all('id')[0]
-        title = self.request.get_all('title')[0]
-        heart = Heart.all()
-        heart = heart.filter("id =", id[0]).get()
-        if heart is None:
-            heart = Heart(title=title,id=id)
-            heart.put()
+        org = int(self.request.get_all('org')[0])
 
-        heart.registerPulse()
+        h = Organization.get_by_id(org).get_heart(id)
+        h.registerPulse()
+
         self.response.write('ok')
 
 app = webapp2.WSGIApplication([
