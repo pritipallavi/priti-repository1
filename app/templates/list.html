@@ -1,0 +1,28 @@
+<div class="row">
+	<div class="span12">
+		<div class="page-header">
+			<h2>Organiztions</h2>
+		</div>
+		<p>Here is a list of the organizations we are monitoring for you.</p>
+	</div>
+</div>
+
+<div class="row" ng-show="organizations.length == 0">
+	<div class="span12">
+		<p>There are no organizations for you currently</p>
+	</div>
+</div>
+
+<div class="row" ng-show="organizations.length != 0">
+	<div class="span12">
+		<ul ng-repeat="organization in organizations">
+			<li><a href="#/organizations/{{organization.id}}">{{organization.name}}</a></li>
+		</ul>
+	</div>
+</div>
+
+<div class="row">
+	<div class="span11 input-append">
+		<input type="text" placeholder="Organization name" required class="input-block-level"><button class="btn btn-primary">Create</button>
+	</div>
+</div>

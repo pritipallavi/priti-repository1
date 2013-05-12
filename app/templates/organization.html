@@ -1,0 +1,46 @@
+<div class="row">
+	<div class="span12">
+		<div class="page-header">
+			<h2>{{name}}</h2>
+		</div>
+	</div>
+</div>
+
+<div class="row" ng-show="newhearts.length != 0">
+	<div class="span11 alert alert-info">
+		There are new hearts being monitorered, please take a moment to describe them.
+		<ul ng-repeat="heart in newhearts">
+			<li><a href="#/hearts/{{heart.id}}">{{heart.name}}</a></li>
+		</ul>
+	</div>
+</div>
+
+<div class="row">
+	<div class="span11 alert alert-danger">
+		<h2>Danger!</h2>
+		<p>Heartbeats have not been reported within the critical time period for the following hearts:</p>
+		<ul ng-repeat="heart in dangerhearts">
+			<li><a href="#/hearts/{{heart.id}}">{{heart.name}}</a></li>
+		</ul>
+	</div>
+</div>
+
+<div class="row">
+	<div class="span11 alert alert-warning">
+		<h2>Warning!</h2>
+		<p>The following hearts havn't beaten in a while</p>
+		<ul ng-repeat="heart in warninghearts">
+			<li><a href="#/hearts/{{heart.id}}">{{heart.name}}</a></li>
+		</ul>
+	</div>
+</div>
+
+
+<div class="row" ng-show="warninghearts.length == 0 && dangerhearts.length == 0">
+	<div class="span11 alert alert-success">
+		<h2>Relax!</h2>
+		<p>Everything is reporting within expected ranges.</p>
+	</div>
+</div>
+
+
