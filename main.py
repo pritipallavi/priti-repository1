@@ -15,12 +15,25 @@
 # limitations under the License.
 #
 import webapp2
+import json
+from google.appengine.api import users
+from models.organization import Organization
+
+
+def indextransform(org):
+    return {
+        'title': org.title,
+        'key': org.key.id(),
+    }
 
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
-        self.response.write('Hello world!')
+        user = users.get_current_user()
+        orgs = Organization.all().filter('users =', user.email())
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.out.write(json.dumps(map(indextransform, orgs)))
 
 app = webapp2.WSGIApplication([
-    ('/', MainHandler)
+    ('/api', MainHandler)
 ], debug=True)
