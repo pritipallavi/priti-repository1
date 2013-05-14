@@ -24,7 +24,7 @@ from models.heart import Heart
 
 def indextransform(org):
     return {
-        'title': org.title,
+        'title': org.title or org.key().id_or_name(),
         'key': org.key().id(),
     }
 
@@ -54,7 +54,7 @@ class SummaryHandler(webapp2.RequestHandler):
         dangerhearts = filter(lambda x: x.last_pulse + datetime.timedelta(seconds=x.threshold*2) < datetime.datetime.now(), allhearts)
         warninghearts = filter(lambda x: x.last_pulse + datetime.timedelta(seconds=x.threshold) < datetime.datetime.now(), allhearts)
         self.response.headers['Content-Type'] = 'application/json'
-        self.response.out.write(json.dumps({'title': org.title, 'newhearts': map(lambda h: {'key': h.key().id_or_name(), 'title': 'new heart'}, newhearts), 'dangerhearts': map(indextransform, dangerhearts), 'warninghearts': map(indextransform, warninghearts)}))
+        self.response.out.write(json.dumps({'title': org.title, 'newhearts': map(indextransform, newhearts), 'dangerhearts': map(indextransform, dangerhearts), 'warninghearts': map(indextransform, warninghearts)}))
 
 
 app = webapp2.WSGIApplication([
