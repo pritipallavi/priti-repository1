@@ -13,5 +13,7 @@ function ListCtrl ($scope, $http) {
 
 function OrganCtrl ($scope) {
 	$scope.name = "RemoteX";
+	$scope.dangerhearts = [];
+	$scope.warninghearts = [];
+	$scope.newhearts = [];
 }
-
