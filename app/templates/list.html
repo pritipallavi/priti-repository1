@@ -16,13 +16,15 @@
 <div class="row" ng-show="organizations.length != 0">
 	<div class="span12">
 		<ul ng-repeat="organization in organizations">
-			<li><a href="#/organizations/{{organization.id}}">{{organization.name}}</a></li>
+			<li><a href="#/organizations/{{organization.key}}">{{organization.title}}</a></li>
 		</ul>
 	</div>
 </div>
 
 <div class="row">
 	<div class="span11 input-append">
-		<input type="text" placeholder="Organization name" required class="input-block-level"><button class="btn btn-primary">Create</button>
+		<form ng-submit="create()">
+			<input type="text" placeholder="Organization name" required class="input-block-level" ng-model="title"><input type='submit' class="btn btn-primary">Create</type>
+		</form>	
 	</div>
 </div>

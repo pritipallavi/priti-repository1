@@ -23,17 +23,25 @@ from models.organization import Organization
 def indextransform(org):
     return {
         'title': org.title,
-        'key': org.key.id(),
+        'key': org.key().id(),
     }
 
 
-class MainHandler(webapp2.RequestHandler):
+class OrganizationHandler(webapp2.RequestHandler):
     def get(self):
         user = users.get_current_user()
         orgs = Organization.all().filter('users =', user.email())
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(json.dumps(map(indextransform, orgs)))
 
+    def post(self):
+        payload = json.loads(self.request.body)
+        org = Organization(title=payload['title'])
+        org.users = [users.get_current_user().email()]
+        org.key = org.put()
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.out.write(json.dumps(indextransform(org)))
+
 app = webapp2.WSGIApplication([
-    ('/api', MainHandler)
+    ('/api/me/organizations', OrganizationHandler)
 ], debug=True)

@@ -8,7 +8,16 @@ angular.module('ekg', []).
 
 function ListCtrl ($scope, $http) {
 	$scope.organizations = [];
-	$scope.organizations.push({name:'Remotex', id:1});
+	$http.get("/api/me/organizations").success(function(result) {
+		$scope.organizations = result;
+	});
+
+	$scope.create = function  () {
+		$http.post("/api/me/organizations", {title:$scope.title}).success(function(result) {
+			$scope.organizations.push(result);
+		});
+		$scope.title = '';
+	};
 }
 
 function OrganCtrl ($scope) {
