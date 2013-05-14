@@ -25,7 +25,7 @@ from models.heart import Heart
 def indextransform(org):
     return {
         'title': org.title or org.key().id_or_name(),
-        'key': org.key().id(),
+        'key': org.key().id_or_name(),
     }
 
 

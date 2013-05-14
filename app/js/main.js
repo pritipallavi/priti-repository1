@@ -22,6 +22,7 @@ function ListCtrl ($scope, $http) {
 }
 
 function OrganCtrl ($scope, $http, $routeParams) {
+	$scope.organization = $routeParams.organization;
 	$http.get("/api/organizations/"+$routeParams.organization).success(function(result) {
 		$scope.title = result.title;
 		$scope.dangerhearts = result.dangerhearts;

@@ -11,7 +11,7 @@
 		<h2>New heartbeats</h2>
 		There are new hearts being monitorered, please take a moment to describe each.
 		<ul ng-repeat="heart in newhearts">
-			<li><a href="#/hearts/{{heart.key}}">{{heart.title}}</a></li>
+			<li><a href="#/organizations/{{organization}}/{{heart.key}}">{{heart.title}}</a></li>
 		</ul>
 	</div>
 </div>
@@ -21,7 +21,7 @@
 		<h2>Critical!</h2>
 		<p>Heartbeats have not been reported within the critical time period for the following hearts.</p>
 		<ul ng-repeat="heart in dangerhearts">
-			<li><a href="#/hearts/{{heart.key}}">{{heart.title}}</a></li>
+			<li><a href="#/organizations/{{organization}}/{{heart.key}}">{{heart.title}}</a></li>
 		</ul>
 	</div>
 </div>
@@ -31,7 +31,7 @@
 		<h2>Warning!</h2>
 		<p>The following hearts are approaching their critical range for reporting in.</p>
 		<ul ng-repeat="heart in warninghearts">
-			<li><a href="#/hearts/{{heart.key}}">{{heart.title}}</a></li>
+			<li><a href="#/organizations/{{organization}}/{{heart.key}}">{{heart.title}}</a></li>
 		</ul>
 	</div>
 </div>
