@@ -50,7 +50,7 @@ class SummaryHandler(webapp2.RequestHandler):
         id = int(self.request.url.rsplit('/', 1)[1])
         org = Organization.get_by_id(id)
         allhearts = Heart.all().ancestor(org.key()).fetch(2000)
-        newhearts = filter(lambda x: x.title == '' or x.title == None, allhearts)
+        newhearts = filter(lambda x: x.title == '' or x.title is None, allhearts)
         dangerhearts = filter(lambda x: x.last_pulse + datetime.timedelta(seconds=x.threshold*2) < datetime.datetime.now(), allhearts)
         warninghearts = filter(lambda x: x.last_pulse + datetime.timedelta(seconds=x.threshold) < datetime.datetime.now(), allhearts)
         self.response.headers['Content-Type'] = 'application/json'

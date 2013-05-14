@@ -3,6 +3,7 @@ angular.module('ekg', []).
     $routeProvider.
       when('/', {controller:ListCtrl, templateUrl:'templates/list.html'}).
       when('/organizations/:organization', {controller:OrganCtrl, templateUrl:'templates/organization.html'}).
+      when('/organizations/:organization/:heart', {controller:HeartCtrl, templateUrl:'templates/heart.html'}).
       otherwise({redirectTo:'/'});
   });
 
@@ -30,4 +31,7 @@ function OrganCtrl ($scope, $http, $routeParams) {
 	$scope.dangerhearts = [];
 	$scope.warninghearts = [];
 	$scope.newhearts = [];
+}
+
+function HeartCtrl ($scope, $http, $routeParams) {
 }
