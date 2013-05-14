@@ -20,8 +20,13 @@ function ListCtrl ($scope, $http) {
 	};
 }
 
-function OrganCtrl ($scope) {
-	$scope.name = "RemoteX";
+function OrganCtrl ($scope, $http, $routeParams) {
+	$http.get("/api/organizations/"+$routeParams.organization).success(function(result) {
+		$scope.title = result.title;
+		$scope.dangerhearts = result.dangerhearts;
+		$scope.warninghearts = result.warninghearts;
+		$scope.newhearts = result.newhearts;
+	});
 	$scope.dangerhearts = [];
 	$scope.warninghearts = [];
 	$scope.newhearts = [];

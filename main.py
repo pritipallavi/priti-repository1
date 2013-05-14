@@ -18,6 +18,7 @@ import webapp2
 import json
 from google.appengine.api import users
 from models.organization import Organization
+from models.heart import Heart
 
 
 def indextransform(org):
@@ -42,6 +43,17 @@ class OrganizationHandler(webapp2.RequestHandler):
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(json.dumps(indextransform(org)))
 
+
+class SummaryHandler(webapp2.RequestHandler):
+    def get(self):
+        id = int(self.request.url.rsplit('/', 1)[1])
+        org = Organization.get_by_id(id)
+        newhearts = Heart.all().ancestor(org.key()).filter('title =', '').fetch(2000)
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.out.write(json.dumps({'title': org.title, 'newhearts': newhearts}))
+
+
 app = webapp2.WSGIApplication([
-    ('/api/me/organizations', OrganizationHandler)
+    ('/api/me/organizations', OrganizationHandler),
+    ('/api/organizations/.*', SummaryHandler)
 ], debug=True)
