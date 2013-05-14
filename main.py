@@ -50,11 +50,11 @@ class SummaryHandler(webapp2.RequestHandler):
         id = int(self.request.url.rsplit('/', 1)[1])
         org = Organization.get_by_id(id)
         allhearts = Heart.all().ancestor(org.key()).fetch(2000)
-        newhearts = filter(lambda x: x.title == '', allhearts)
-        dangerhearts = filter(lambda x: x.last_pulse + datetime.timedelta(seconds=x.threshold*2) < datetime.datetime.now, allhearts)
-        warninghearts = filter(lambda x: x.last_pulse + datetime.timedelta(seconds=x.threshold) < datetime.datetime.now, allhearts)
+        newhearts = filter(lambda x: x.title == '' or x.title == None, allhearts)
+        dangerhearts = filter(lambda x: x.last_pulse + datetime.timedelta(seconds=x.threshold*2) < datetime.datetime.now(), allhearts)
+        warninghearts = filter(lambda x: x.last_pulse + datetime.timedelta(seconds=x.threshold) < datetime.datetime.now(), allhearts)
         self.response.headers['Content-Type'] = 'application/json'
-        self.response.out.write(json.dumps({'title': org.title, 'newhearts': newhearts, 'dangerhearts': dangerhearts, 'warninghearts': warninghearts}))
+        self.response.out.write(json.dumps({'title': org.title, 'newhearts': map(lambda h: {'key': h.key().id_or_name(), 'title': 'new heart'}, newhearts), 'dangerhearts': map(indextransform, dangerhearts), 'warninghearts': map(indextransform, warninghearts)}))
 
 
 app = webapp2.WSGIApplication([
