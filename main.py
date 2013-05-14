@@ -16,6 +16,7 @@
 #
 import webapp2
 import json
+import datetime
 from google.appengine.api import users
 from models.organization import Organization
 from models.heart import Heart
@@ -48,9 +49,12 @@ class SummaryHandler(webapp2.RequestHandler):
     def get(self):
         id = int(self.request.url.rsplit('/', 1)[1])
         org = Organization.get_by_id(id)
-        newhearts = Heart.all().ancestor(org.key()).filter('title =', '').fetch(2000)
+        allhearts = Heart.all().ancestor(org.key()).fetch(2000)
+        newhearts = filter(lambda x: x.title == '', allhearts)
+        dangerhearts = filter(lambda x: x.last_pulse + datetime.timedelta(seconds=x.threshold*2) < datetime.datetime.now, allhearts)
+        warninghearts = filter(lambda x: x.last_pulse + datetime.timedelta(seconds=x.threshold) < datetime.datetime.now, allhearts)
         self.response.headers['Content-Type'] = 'application/json'
-        self.response.out.write(json.dumps({'title': org.title, 'newhearts': newhearts}))
+        self.response.out.write(json.dumps({'title': org.title, 'newhearts': newhearts, 'dangerhearts': dangerhearts, 'warninghearts': warninghearts}))
 
 
 app = webapp2.WSGIApplication([
