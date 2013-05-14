@@ -1,0 +1,25 @@
+<div class="row">
+	<div class="span12">
+		<div class="page-header">
+			<h2>{{title_or_key}}</h2>
+		</div>
+	</div>
+</div>
+
+
+<div class="row" >
+	<div class="span12">
+		Last recorded hearbeat was {{last_pulse}}.
+	</div>
+</div>
+
+
+<div class="row" >
+	<div class="span12">
+		<form ng-submit="update">
+			<input type="text" required ng-model="title"/>
+			<input type="text" required ng-model="threshold"/>
+			<input type=submit class="btn btn-primary" value="save"/>
+		</form>
+	</div>
+</div>
