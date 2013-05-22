@@ -1,0 +1,4 @@
+cron:
+- description: check for flatlines
+  url: /checkforflatlines
+  schedule: every 6 minutes

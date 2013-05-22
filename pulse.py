@@ -16,6 +16,7 @@
 #
 import webapp2
 from models.organization import Organization
+from models.heart import Heart
 
 
 class PulseHandler(webapp2.RequestHandler):
@@ -29,6 +30,16 @@ class PulseHandler(webapp2.RequestHandler):
 
         self.response.write('ok')
 
+
+class CheckForFlatlineHandler(webapp2.RequestHandler):
+    def get(self):
+        hearts = Heart.all().fetch(5000)
+        for heart in hearts:
+            heart.checkFlatLine()
+        self.response.write('ok')
+
+
 app = webapp2.WSGIApplication([
-    ('/pulse.*', PulseHandler)
+    ('/pulse.*', PulseHandler),
+    ('/checkforflatlines.*', CheckForFlatlineHandler)
 ], debug=True)

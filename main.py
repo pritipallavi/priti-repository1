@@ -16,16 +16,23 @@
 #
 import webapp2
 import json
-import datetime
 from google.appengine.api import users
 from models.organization import Organization
-from models.heart import Heart
+from models.heart import Heart, Flatline
 
 
 def indextransform(org):
     return {
         'title': org.title or org.key().id_or_name(),
         'key': org.key().id_or_name(),
+    }
+
+
+def flatlinetransform(f):
+    return {
+        'start': str(f.start),
+        'heart': f.parent().key().id_or_name(),
+        'title': f.parent().title
     }
 
 
@@ -49,12 +56,10 @@ class SummaryHandler(webapp2.RequestHandler):
     def get(self):
         id = int(self.request.url.rsplit('/', 1)[1])
         org = Organization.get_by_id(id)
-        allhearts = Heart.all().ancestor(org.key()).fetch(2000)
-        newhearts = filter(lambda x: x.title == '' or x.title is None, allhearts)
-        dangerhearts = filter(lambda x: x.last_pulse + datetime.timedelta(seconds=x.threshold*2) < datetime.datetime.now(), allhearts)
-        warninghearts = filter(lambda x: x.last_pulse + datetime.timedelta(seconds=x.threshold) < datetime.datetime.now(), allhearts)
+        newhearts = Heart.all().ancestor(org.key()).filter('title =', '').fetch(2000)
+        flatlines = Flatline.all().filter("active =", True).fetch(2000)
         self.response.headers['Content-Type'] = 'application/json'
-        self.response.out.write(json.dumps({'title': org.title, 'newhearts': map(indextransform, newhearts), 'dangerhearts': map(indextransform, dangerhearts), 'warninghearts': map(indextransform, warninghearts)}))
+        self.response.out.write(json.dumps({'title': org.title, 'newhearts': map(indextransform, newhearts), 'flatlines': map(flatlinetransform, flatlines)}))
 
 
 app = webapp2.WSGIApplication([
