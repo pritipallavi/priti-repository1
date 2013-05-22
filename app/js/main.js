@@ -25,7 +25,10 @@ function OrganCtrl ($scope, $http, $routeParams) {
 	$scope.organization = $routeParams.organization;
 	$http.get("/api/organizations/"+$routeParams.organization).success(function(result) {
 		$scope.title = result.title;
-		$scope.flatlines = result.flatlines;
+		$scope.flatlines = result.flatlines.map(function(f) {
+			f.how_long = moment.utc(f.start).fromNow();
+			return f;
+		});
 		$scope.newhearts = result.newhearts;
 	});
 	$scope.flatlines = [];
