@@ -49,7 +49,7 @@ class OrganizationHandler(webapp2.RequestHandler):
         org.users = [users.get_current_user().email()]
         org.key = org.put()
         self.response.headers['Content-Type'] = 'application/json'
-        self.response.out.write(json.dumps(indextransform(org)))
+        self.response.out.write(json.dumps({'title': org.title, 'key':org.key.id_or_name()}))
 
 
 class SummaryHandler(webapp2.RequestHandler):
