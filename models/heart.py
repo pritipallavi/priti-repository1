@@ -1,5 +1,6 @@
 from google.appengine.ext import db
 import datetime
+from models import resuscitate_mail, flatline_mail
 
 
 class Heart(db.Model):
@@ -11,9 +12,7 @@ class Heart(db.Model):
     def registerPulse(self):
         flatline = self.getActiveFlatline()
         if flatline is not None:
-            flatline.active = False
-            flatline.end = datetime.datetime.now()
-            flatline.put()
+            flatline.resuscitate()
         self.last_pulse = datetime.datetime.now()
         self.put()
 
@@ -28,9 +27,16 @@ class Heart(db.Model):
         if self.last_pulse + datetime.timedelta(seconds=self.threshold*2) > datetime.datetime.now():
             return
         Flatline(parent=self).put()
+        flatline_mail(self)
 
 
 class Flatline(db.Model):
     start = db.DateTimeProperty(auto_now_add=True)
     active = db.BooleanProperty(default=True)
     end = db.DateTimeProperty()
+
+    def resuscitate(self):
+        self.active = False
+        self.end = datetime.datetime.now()
+        resuscitate_mail(self.parent())
+        self.put()
