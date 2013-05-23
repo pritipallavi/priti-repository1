@@ -43,4 +43,10 @@ function HeartCtrl ($scope, $http, $routeParams) {
 		$scope.last_pulse = result.last_pulse;
 		$scope.last_pulse_text = moment.utc(result.last_pulse).fromNow();
 	});
+
+	$scope.save = function() {
+		$http.put("/api/organizations/"+$routeParams.organization+"/hearts/"+$routeParams.heart, {title:$scope.title, threshold:$scope.threshold}).success(function(result) {
+			alert('saved');
+		});
+	};
 }

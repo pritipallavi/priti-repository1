@@ -54,7 +54,17 @@ class HeartHandler(webapp2.RequestHandler):
         key = self.request.url.rsplit('/', 1)[1]
         heart = Heart.get_by_key_name(key, parent=org)
         self.response.headers['Content-Type'] = 'application/json'
-        self.response.out.write(json.dumps({'title': id, 'threshold': heart.threshold, 'last_pulse': str(heart.last_pulse)}))
+        self.response.out.write(json.dumps({'title': heart.title or heart.key().id_or_name(), 'threshold': heart.threshold, 'last_pulse': str(heart.last_pulse)}))
+
+    def put(self):
+        payload = json.loads(self.request.body)
+        id = int(self.request.url.rsplit('/', 3)[1])
+        org = Organization.get_by_id(id)
+        key = self.request.url.rsplit('/', 1)[1]
+        heart = Heart.get_by_key_name(key, parent=org)
+        heart.title = str(payload['title'])
+        heart.threshold = int(payload['threshold'])
+        heart.put()
 
 
 app = webapp2.WSGIApplication([
