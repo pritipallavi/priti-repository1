@@ -3,8 +3,7 @@ import datetime
 
 
 class Heart(db.Model):
-    title = db.StringProperty()
-    id = db.StringProperty()
+    title = db.StringProperty(default='')
     created = db.DateTimeProperty(auto_now_add=True)
     last_pulse = db.DateTimeProperty(auto_now_add=True)
     threshold = db.IntegerProperty(default=0)

@@ -33,7 +33,7 @@ class PulseHandler(webapp2.RequestHandler):
 
 class CheckForFlatlineHandler(webapp2.RequestHandler):
     def get(self):
-        hearts = Heart.all().fetch(5000)
+        hearts = Heart.all().filter('threshold >', 0).fetch(5000)
         for heart in hearts:
             heart.checkFlatLine()
         self.response.write('ok')
