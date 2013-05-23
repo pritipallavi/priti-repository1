@@ -36,4 +36,11 @@ function OrganCtrl ($scope, $http, $routeParams) {
 }
 
 function HeartCtrl ($scope, $http, $routeParams) {
+
+	$http.get("/api/organizations/"+$routeParams.organization+"/hearts/"+$routeParams.heart).success(function(result) {
+		$scope.threshold = result.threshold;
+		$scope.title = result.title;
+		$scope.last_pulse = result.last_pulse;
+		$scope.last_pulse_text = moment.utc(result.last_pulse).fromNow();
+	});
 }

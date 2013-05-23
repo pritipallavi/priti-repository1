@@ -62,7 +62,18 @@ class SummaryHandler(webapp2.RequestHandler):
         self.response.out.write(json.dumps({'title': org.title, 'newhearts': map(indextransform, newhearts), 'flatlines': map(flatlinetransform, flatlines)}))
 
 
+class HeartHandler(webapp2.RequestHandler):
+    def get(self):
+        id = int(self.request.url.rsplit('/', 3)[1])
+        org = Organization.get_by_id(id)
+        key = self.request.url.rsplit('/', 1)[1]
+        heart = Heart.get_by_key_name(key, parent=org)
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.out.write(json.dumps({'title': id, 'threshold': heart.threshold, 'last_pulse': str(heart.last_pulse)}))
+
+
 app = webapp2.WSGIApplication([
     ('/api/me/organizations', OrganizationHandler),
+    ('/api/organizations/.*/hearts/.*', HeartHandler),
     ('/api/organizations/.*', SummaryHandler)
 ], debug=True)

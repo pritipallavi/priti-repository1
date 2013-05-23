@@ -21,7 +21,7 @@
 		<h2>Critical!</h2>
 		<p>Heartbeats have not been reported within the critical time period for the following hearts.</p>
 		<ul ng-repeat="flatline in flatlines">
-			<li><a href="#/organizations/{{organization}}/{{flatline.heart}}">{{flatline.title || flatline.heart}} has flatlined since {{flatline.how_long}}</a></li>
+			<li><a href="#/organizations/{{organization}}/{{flatline.heart}}">{{flatline.title || flatline.heart}} flatlined {{flatline.how_long}}</a></li>
 		</ul>
 	</div>
 </div>
