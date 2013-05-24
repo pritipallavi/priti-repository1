@@ -1,7 +1,7 @@
 <div class="row">
 	<div class="span12">
 		<div class="page-header">
-			<h2>{{title_or_key}}</h2>
+			<h2>{{title}}</h2>
 		</div>
 	</div>
 </div>
@@ -9,17 +9,33 @@
 
 <div class="row" >
 	<div class="span12">
-		Last recorded hearbeat was {{last_pulse_text}}.
+		<p>Last recorded hearbeat was {{last_pulse_text}}.</p>
 	</div>
 </div>
 
 
 <div class="row" >
 	<div class="span12">
-		<form ng-submit="save()">
-			<input type="text" required ng-model="title"/>
-			<input type="text" required ng-model="threshold"/>
-			<input type='submit' class="btn btn-primary" value="save"/>
+		<form ng-submit="save()"  class="form-horizontal">
+			<div class="control-group">
+				<label class="control-label" for="title">Title</label>
+				<div class="controls">
+					<input type="text" id="title" required ng-model="title">
+				</div>
+			</div>
+
+			<div class="control-group">
+				<label class="control-label" for="threshold">Threshold</label>
+				<div class="controls">
+					<input type="text" id="threshold" required ng-model="threshold"><span class="help-inline">In seconds. 0 means it wont be checked and is treated as inactive.</span>
+				</div>
+			</div>
+			<div class="control-group">
+				<div class="controls">
+					<input type='submit' class="btn btn-primary" value="save"/>
+				</div>
+			</div>
+			
 		</form>
 	</div>
 </div>
