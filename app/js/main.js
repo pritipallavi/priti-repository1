@@ -1,12 +1,32 @@
 angular.module('ekg', []).
-  config(function($routeProvider) {
-    $routeProvider.
-      when('/', {controller:ListCtrl, templateUrl:'templates/list.html'}).
-      when('/organizations/:organization', {controller:OrganCtrl, templateUrl:'templates/organization.html'}).
-      when('/organizations/:organization/:heart', {controller:HeartCtrl, templateUrl:'templates/heart.html'}).
-      otherwise({redirectTo:'/'});
-  });
+config(function($routeProvider) {
+	$routeProvider.
+	when('/', {controller:ListCtrl, templateUrl:'templates/list.html'}).
+	when('/organizations/:organization', {controller:OrganCtrl, templateUrl:'templates/organization.html'}).
+	when('/organizations/:organization/:heart', {controller:HeartCtrl, templateUrl:'templates/heart.html'}).
+	when('/invitations/:invite', {controller:InviteCtrl, templateUrl:'templates/invite.html'}).
+	otherwise({redirectTo:'/'});
+});
 
+function InviteCtrl ($scope, $http, $routeParams) {
+	$http.get("/api/invitations/"+$routeParams.invite).success(function(result) {
+		$scope.title = result.title;
+	});
+
+	$scope.accept = function() {
+		$http.get("/api/invitations/"+routeParams.invite+"/accept").success(function() {
+			$scope.accepted = true;
+			$scope.answered = true;
+		});
+	};
+
+	$scope.decline = function() {
+		$http.get("/api/invitations/"+routeParams.invite+"/decline").success(function() {
+			$scope.accepted = false;
+			$scope.answered = true;
+		});
+	};
+}
 function ListCtrl ($scope, $http) {
 	$scope.organizations = [];
 	$http.get("/api/me/organizations").success(function(result) {
