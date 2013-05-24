@@ -2,6 +2,7 @@ angular.module('ekg', []).
 config(function($routeProvider) {
 	$routeProvider.
 	when('/', {controller:ListCtrl, templateUrl:'templates/list.html'}).
+	when('/organizations/:organization/config', {controller:DetailsCtrl, templateUrl:'templates/config.html'}).
 	when('/organizations/:organization', {controller:OrganCtrl, templateUrl:'templates/organization.html'}).
 	when('/organizations/:organization/:heart', {controller:HeartCtrl, templateUrl:'templates/heart.html'}).
 	when('/invitations/:invite', {controller:InviteCtrl, templateUrl:'templates/invite.html'}).
@@ -39,6 +40,13 @@ function ListCtrl ($scope, $http) {
 		});
 		$scope.title = '';
 	};
+}
+
+function DetailsCtrl ($scope, $http, $routeParams) {
+	$scope.organization = $routeParams.organization;
+	$http.get("/api/organizations/"+$routeParams.organization).success(function(result) {
+		$scope.title = result.title;
+	});
 }
 
 function OrganCtrl ($scope, $http, $routeParams) {
