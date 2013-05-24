@@ -26,7 +26,9 @@ class Heart(db.Model):
 
         if self.last_pulse + datetime.timedelta(seconds=self.threshold*2) > datetime.datetime.now():
             return
-        Flatline(parent=self).put()
+        f = Flatline(parent=self)
+        f.start = self.last_pulse
+        f.put()
         flatline_mail(self)
 
 
