@@ -45,8 +45,11 @@ function HeartCtrl ($scope, $http, $routeParams) {
 	});
 
 	$scope.save = function() {
+		$scope.saving = true;
+		$scope.saved = false;
 		$http.put("/api/organizations/"+$routeParams.organization+"/hearts/"+$routeParams.heart, {title:$scope.title, threshold:$scope.threshold}).success(function(result) {
-			alert('saved');
+			$scope.saved = true;
+			$scope.saving = false;
 		});
 	};
 }
