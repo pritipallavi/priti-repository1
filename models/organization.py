@@ -25,7 +25,7 @@ class Invitation(db.Model):
         invite_mail(self)
 
     def accept(self):
-        self.parent().users.push(users.get_current_user().email())
+        self.parent().users.append(users.get_current_user().email())
         self.parent().put()
         self.delete()
 

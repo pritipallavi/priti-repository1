@@ -10,22 +10,20 @@ config(function($locationProvider, $routeProvider) {
 	otherwise({redirectTo:'/app/'});
 });
 
-function InviteCtrl ($scope, $http, $routeParams) {
+function InviteCtrl ($scope, $http, $routeParams, $location) {
 	$http.get("/api/invitations/"+$routeParams.invite).success(function(result) {
 		$scope.title = result.title;
 	});
 
 	$scope.accept = function() {
-		$http.get("/api/invitations/"+routeParams.invite+"/accept").success(function() {
-			$scope.accepted = true;
-			$scope.answered = true;
+		$http.get("/api/invitations/"+$routeParams.invite+"/accept").success(function() {
+			$location.path('/app/');
 		});
 	};
 
 	$scope.decline = function() {
-		$http.get("/api/invitations/"+routeParams.invite+"/decline").success(function() {
-			$scope.accepted = false;
-			$scope.answered = true;
+		$http.get("/api/invitations/"+$routeParams.invite+"/decline").success(function() {
+			$location.path('/app/');
 		});
 	};
 }

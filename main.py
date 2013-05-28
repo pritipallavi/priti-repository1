@@ -89,14 +89,16 @@ class InvitationHandler(webapp2.RequestHandler):
 
 class InvitationAcceptHandler(webapp2.RequestHandler):
     def get(self):
-        id = self.request.url.rsplit('/', 1)[1]
+        id = self.request.url.rsplit('/', 2)[1]
+        print id
         inv = Invitation.get(id)
         inv.accept()
 
 
 class InvitationDeclineHandler(webapp2.RequestHandler):
     def get(self):
-        id = self.request.url.rsplit('/', 1)[1]
+        id = self.request.url.rsplit('/', 2)[1]
+        print id
         inv = Invitation.get(id)
         inv.decline()
 
@@ -104,6 +106,8 @@ class InvitationDeclineHandler(webapp2.RequestHandler):
 app = webapp2.WSGIApplication([
     ('/api/me/organizations', OrganizationHandler),
     ('/api/organizations/.*/hearts/.*', HeartHandler),
+    ('/api/invitations/.*/accept', InvitationAcceptHandler),
+    ('/api/invitations/.*/decline', InvitationDeclineHandler),
     ('/api/invitations/.*', InvitationHandler),
     ('/api/organizations/.*', SummaryHandler)
 ], debug=True)
