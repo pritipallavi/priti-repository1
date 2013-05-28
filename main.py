@@ -89,15 +89,15 @@ class InvitationHandler(webapp2.RequestHandler):
 
 class InvitationAcceptHandler(webapp2.RequestHandler):
     def get(self):
-        id = int(self.request.url.rsplit('/', 1)[1])
-        inv = Invitation.get_by_id(id)
+        id = self.request.url.rsplit('/', 1)[1]
+        inv = Invitation.get(id)
         inv.accept()
 
 
 class InvitationDeclineHandler(webapp2.RequestHandler):
     def get(self):
-        id = int(self.request.url.rsplit('/', 1)[1])
-        inv = Invitation.get_by_id(id)
+        id = self.request.url.rsplit('/', 1)[1]
+        inv = Invitation.get(id)
         inv.decline()
 
 
