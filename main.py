@@ -74,9 +74,9 @@ class HeartHandler(webapp2.RequestHandler):
 
 class InvitationHandler(webapp2.RequestHandler):
     def get(self):
-        id = int(self.request.url.rsplit('/', 1))[1]
-        inv = Invitation.get_by_id(id)
-        self.response.out.write(json.dump({'title': inv.parent().title}))
+        id = self.request.url.rsplit('/', 1)[1]
+        inv = Invitation.get(id)
+        self.response.out.write(json.dumps({'title': inv.parent().title}))
 
     def post(self):
         payload = json.loads(self.request.body)
@@ -89,14 +89,14 @@ class InvitationHandler(webapp2.RequestHandler):
 
 class InvitationAcceptHandler(webapp2.RequestHandler):
     def get(self):
-        id = int(self.request.url.rsplit('/', 1))[1]
+        id = int(self.request.url.rsplit('/', 1)[1])
         inv = Invitation.get_by_id(id)
         inv.accept()
 
 
 class InvitationDeclineHandler(webapp2.RequestHandler):
     def get(self):
-        id = int(self.request.url.rsplit('/', 1))[1]
+        id = int(self.request.url.rsplit('/', 1)[1])
         inv = Invitation.get_by_id(id)
         inv.decline()
 

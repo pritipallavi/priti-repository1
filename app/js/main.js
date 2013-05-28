@@ -1,12 +1,13 @@
 angular.module('ekg', []).
-config(function($routeProvider) {
+config(function($locationProvider, $routeProvider) {
+	$locationProvider.html5Mode(true);
 	$routeProvider.
-	when('/', {controller:ListCtrl, templateUrl:'templates/list.html'}).
-	when('/organizations/:organization/config', {controller:DetailsCtrl, templateUrl:'templates/config.html'}).
-	when('/organizations/:organization', {controller:OrganCtrl, templateUrl:'templates/organization.html'}).
-	when('/organizations/:organization/:heart', {controller:HeartCtrl, templateUrl:'templates/heart.html'}).
-	when('/invitations/:invite', {controller:InviteCtrl, templateUrl:'templates/invite.html'}).
-	otherwise({redirectTo:'/'});
+	when('/app/', {controller:ListCtrl, templateUrl:'/app/templates/list.html'}).
+	when('/app/organizations/:organization/config', {controller:DetailsCtrl, templateUrl:'/app/templates/config.html'}).
+	when('/app/organizations/:organization', {controller:OrganCtrl, templateUrl:'/app/templates/organization.html'}).
+	when('/app/organizations/:organization/:heart', {controller:HeartCtrl, templateUrl:'/app/templates/heart.html'}).
+	when('/app/invitations/:invite', {controller:InviteCtrl, templateUrl:'/app/templates/invite.html'}).
+	otherwise({redirectTo:'/app/'});
 });
 
 function InviteCtrl ($scope, $http, $routeParams) {
@@ -46,7 +47,15 @@ function DetailsCtrl ($scope, $http, $routeParams) {
 	$scope.organization = $routeParams.organization;
 	$http.get("/api/organizations/"+$routeParams.organization).success(function(result) {
 		$scope.title = result.title;
+		$scope.users = result.users;
 	});
+	$scope.send = function() {
+		$scope.sending = true;
+		$http.post('/api/invitations/', {organization: $routeParams.organization, email: $scope.email}).success(function() {
+			$scope.sent = true;
+			$scope.sending = false;
+		});
+	};
 }
 
 function OrganCtrl ($scope, $http, $routeParams) {

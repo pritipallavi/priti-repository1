@@ -1,7 +1,7 @@
 <div class="row">
 	<div class="span10">
 		<div class="page-header">
-			<a class='btn pull-right' href="#/organizations/{{organization}}/config"><i class="icon-cog" ></i></a>
+			<a class='btn pull-right' href="/app/organizations/{{organization}}/config"><i class="icon-cog" ></i></a>
 			<h2>{{title}}</h2>
 		</div>
 	</div>
@@ -12,7 +12,7 @@
 		<h2>New heartbeats</h2>
 		There are new hearts being monitorered, please take a moment to describe each.
 		<ul ng-repeat="heart in newhearts">
-			<li><a href="#/organizations/{{organization}}/{{heart.key}}">{{heart.title}}</a></li>
+			<li><a href="/app/organizations/{{organization}}/{{heart.key}}">{{heart.title}}</a></li>
 		</ul>
 	</div>
 </div>
@@ -22,7 +22,7 @@
 		<h2>Critical!</h2>
 		<p>Heartbeats have not been reported within the critical time period for the following hearts.</p>
 		<ul ng-repeat="flatline in flatlines">
-			<li><a href="#/organizations/{{organization}}/{{flatline.heart}}">{{flatline.title || flatline.heart}} flatlined {{flatline.how_long}}</a></li>
+			<li><a href="/app/organizations/{{organization}}/{{flatline.heart}}">{{flatline.title || flatline.heart}} flatlined {{flatline.how_long}}</a></li>
 		</ul>
 	</div>
 </div>
