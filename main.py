@@ -2,7 +2,7 @@
 import webapp2
 import json
 from google.appengine.api import users
-from models.organization import Organization
+from models.organization import Organization, Invitation
 from models.heart import Heart, Flatline
 
 
@@ -44,7 +44,12 @@ class SummaryHandler(webapp2.RequestHandler):
         newhearts = Heart.all().ancestor(org.key()).filter('title =', '').fetch(2000)
         flatlines = Flatline.all().filter("active =", True).fetch(2000)
         self.response.headers['Content-Type'] = 'application/json'
-        self.response.out.write(json.dumps({'title': org.title, 'newhearts': map(indextransform, newhearts), 'flatlines': map(flatlinetransform, flatlines)}))
+        self.response.out.write(json.dumps({
+            'title': org.title,
+            'newhearts': map(indextransform, newhearts),
+            'flatlines': map(flatlinetransform, flatlines),
+            'users': org.users
+        }))
 
 
 class HeartHandler(webapp2.RequestHandler):
@@ -67,8 +72,38 @@ class HeartHandler(webapp2.RequestHandler):
         heart.put()
 
 
+class InvitationHandler(webapp2.RequestHandler):
+    def get(self):
+        id = int(self.request.url.rsplit('/', 1))[1]
+        inv = Invitation.get_by_id(id)
+        self.response.out.write(json.dump({'title': inv.parent().title}))
+
+    def post(self):
+        payload = json.loads(self.request.body)
+        org = Organization.get_by_id(int(payload['organization']))
+        inv = Invitation(parent=org)
+        inv.email = payload['email']
+        inv.put()
+        inv.send()
+
+
+class InvitationAcceptHandler(webapp2.RequestHandler):
+    def get(self):
+        id = int(self.request.url.rsplit('/', 1))[1]
+        inv = Invitation.get_by_id(id)
+        inv.accept()
+
+
+class InvitationDeclineHandler(webapp2.RequestHandler):
+    def get(self):
+        id = int(self.request.url.rsplit('/', 1))[1]
+        inv = Invitation.get_by_id(id)
+        inv.decline()
+
+
 app = webapp2.WSGIApplication([
     ('/api/me/organizations', OrganizationHandler),
     ('/api/organizations/.*/hearts/.*', HeartHandler),
+    ('/api/invitations/.*', InvitationHandler),
     ('/api/organizations/.*', SummaryHandler)
 ], debug=True)
