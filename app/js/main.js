@@ -77,6 +77,10 @@ function HeartCtrl ($scope, $http, $routeParams) {
 		$scope.title = result.title;
 		$scope.last_pulse = result.last_pulse;
 		$scope.last_pulse_text = moment.utc(result.last_pulse).fromNow();
+		$scope.flatlines = result.flatlines.map(function(f) {
+			f.duration = f.end != 'None' ? moment(f.end).from(moment(f.start), true) : 'On going';
+			return f;
+		});
 	});
 
 	$scope.save = function() {
