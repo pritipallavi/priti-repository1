@@ -1,0 +1,22 @@
+<div class="row">
+	<div class="span12">
+		<div class="page-header">
+			<h2>Hearts for {{title}}</h2>
+		</div>
+		<p>Here is a list of the organizations we are monitoring for you.</p>
+	</div>
+</div>
+
+<div class="row" ng-show="hearts.length == 0">
+	<div class="span12">
+		<p>There are no organizations for you currently</p>
+	</div>
+</div>
+
+<div class="row" ng-show="hearts.length != 0">
+	<div class="span12">
+		<ul ng-repeat="heart in hearts">
+			<li><a href="/app/organizations/{{organization}}/hearts/{{heart.key}}">{{heart.title}}</a></li>
+		</ul>
+	</div>
+</div>

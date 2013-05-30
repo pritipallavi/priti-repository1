@@ -5,10 +5,19 @@ config(function($locationProvider, $routeProvider) {
 	when('/app/', {controller:ListCtrl, templateUrl:'/app/templates/list.html'}).
 	when('/app/organizations/:organization/config', {controller:DetailsCtrl, templateUrl:'/app/templates/config.html'}).
 	when('/app/organizations/:organization', {controller:OrganCtrl, templateUrl:'/app/templates/organization.html'}).
-	when('/app/organizations/:organization/:heart', {controller:HeartCtrl, templateUrl:'/app/templates/heart.html'}).
+	when('/app/organizations/:organization/hearts', {controller:HeartListCtrl, templateUrl:'/app/templates/heartlist.html'}).
+	when('/app/organizations/:organization/hearts/:heart', {controller:HeartCtrl, templateUrl:'/app/templates/heart.html'}).
 	when('/app/invitations/:invite', {controller:InviteCtrl, templateUrl:'/app/templates/invite.html'}).
 	otherwise({redirectTo:'/app/'});
 });
+
+function HeartListCtrl ($scope, $http, $routeParams) {
+	$http.get("/api/organizations/"+$routeParams.organization+'/hearts').success(function(result) {
+		$scope.title = result.title;
+		$scope.hearts = result.hearts;
+	});
+	$scope.organization = $routeParams.organization;
+}
 
 function InviteCtrl ($scope, $http, $routeParams, $location) {
 	$http.get("/api/invitations/"+$routeParams.invite).success(function(result) {

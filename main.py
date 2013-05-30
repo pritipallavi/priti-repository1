@@ -106,7 +106,7 @@ class InvitationDeclineHandler(webapp2.RequestHandler):
 
 class HeartsListHandler(webapp2.RequestHandler):
     def get(self):
-        id = int(self.request.url.rsplit('/', 1)[1])
+        id = int(self.request.url.rsplit('/', 2)[1])
         org = Organization.get_by_id(id)
         hearts = Heart.all().ancestor(org.key()).order("-created").fetch(2000)
         self.response.headers['Content-Type'] = 'application/json'
@@ -118,8 +118,8 @@ class HeartsListHandler(webapp2.RequestHandler):
 
 app = webapp2.WSGIApplication([
     ('/api/me/organizations', OrganizationHandler),
-    ('/api/organizations/.*/hearts/^', HeartsListHandler),
-    ('/api/organizations/.*/hearts/.*', HeartHandler),
+    ('/api/organizations/.*/hearts/.+', HeartHandler),
+    ('/api/organizations/.*/hearts', HeartsListHandler),
     ('/api/invitations/.*/accept', InvitationAcceptHandler),
     ('/api/invitations/.*/decline', InvitationDeclineHandler),
     ('/api/invitations/.*', InvitationHandler),

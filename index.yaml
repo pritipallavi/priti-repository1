@@ -21,3 +21,9 @@ indexes:
   properties:
   - name: start
     direction: desc
+
+- kind: Heart
+  ancestor: yes
+  properties:
+  - name: created
+    direction: desc
