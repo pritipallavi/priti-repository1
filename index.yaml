@@ -14,3 +14,10 @@ indexes:
   ancestor: yes
   properties:
   - name: end
+    direction: desc
+
+- kind: Flatline
+  ancestor: yes
+  properties:
+  - name: start
+    direction: desc

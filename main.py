@@ -58,7 +58,7 @@ class HeartHandler(webapp2.RequestHandler):
         org = Organization.get_by_id(id)
         key = self.request.url.rsplit('/', 1)[1]
         heart = Heart.get_by_key_name(key, parent=org)
-        flatlines = Flatline.all().ancestor(heart).order("end").fetch(10)
+        flatlines = Flatline.all().ancestor(heart).order("-start").fetch(10)
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(json.dumps({'title': heart.title or heart.key().id_or_name(), 'threshold': heart.threshold, 'last_pulse': str(heart.last_pulse), 'flatlines': map(lambda f: {'start': str(f.start), 'end': str(f.end), 'active': str(f.active)}, flatlines)}))
 
