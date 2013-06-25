@@ -10,6 +10,8 @@
 <div class="row" >
 	<div class="span12">
 		<p><i class="icon icon-time"></i> Last recorded hearbeat was {{last_pulse_text}}.</p>
+		<p><i class="icon icon-time"></i> Expecting next pulse within {{threshold_guess}}.</p>
+		<p><i class="icon icon-time"></i> Next heartbeat should be in {{cron_guess}}, if its missed I will emails within {{threshold_text}}.</p>
 	</div>
 </div>
 
@@ -23,7 +25,12 @@
 					<input type="text" id="title" required ng-model="title">
 				</div>
 			</div>
-
+			<div class="control-group">
+				<label class="control-label" for="cron">Cron Schedule</label>
+				<div class="controls">
+					<input type="text" id="cron" required ng-model="cron"><span class="help-inline"><a href='https://en.wikipedia.org/wiki/Cron#Format'>* * * * * format.</a></span>
+				</div>
+			</div>
 			<div class="control-group">
 				<label class="control-label" for="threshold">Threshold</label>
 				<div class="controls">
