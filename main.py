@@ -4,6 +4,7 @@ import json
 from google.appengine.api import users
 from models.organization import Organization, Invitation
 from models.heart import Heart, Flatline
+from lib.croniter import croniter
 
 
 def indextransform(org):
@@ -71,6 +72,7 @@ class HeartHandler(webapp2.RequestHandler):
         heart.title = str(payload['title'])
         heart.threshold = int(payload['threshold'])
         heart.cron = str(payload['cron'])
+        croniter(heart.cron)
         heart.put()
 
 
