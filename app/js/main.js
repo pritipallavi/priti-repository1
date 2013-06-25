@@ -87,6 +87,7 @@ function HeartCtrl ($scope, $http, $routeParams) {
 		$scope.cron = result.cron;
 		$scope.last_pulse = result.last_pulse;
 		$scope.last_pulse_text = moment.utc(result.last_pulse).fromNow();
+		$scope.threshold_guess = moment.utc(result.last_pulse).add('seconds', result.threshold).fromNow(true);
 		$scope.flatlines = result.flatlines.map(function(f) {
 			f.duration = f.end != 'None' ? moment(f.end).from(moment(f.start), true) : 'On going';
 			return f;
