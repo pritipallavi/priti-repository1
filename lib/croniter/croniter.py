@@ -4,7 +4,7 @@
 import re
 from time import time, mktime
 import datetime
-from dateutil.relativedelta import relativedelta
+from lib.dateutil.relativedelta import relativedelta
 
 search_re = re.compile(r'^([^-]+)-([^-/]+)(/(.*))?$')
 only_int_re = re.compile(r'^\d+$')
