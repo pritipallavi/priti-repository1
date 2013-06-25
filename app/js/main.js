@@ -86,7 +86,7 @@ function OrganCtrl ($scope, $http, $routeParams) {
 function HeartCtrl ($scope, $http, $routeParams) {
 
     $scope.updateScheduleInfo = function  () {
-        $scope.last_pulse_text = moment.utc($scope.last_pulse).fromNow();
+        $scope.last_pulse_text = moment($scope.last_pulse).fromNow();
         try{
             var schedule = later.parse.cron($scope.cron);
             $scope.cron_guess = moment.utc(later.schedule(schedule).next(1, $scope.last_pulse)).fromNow();
