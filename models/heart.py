@@ -35,7 +35,7 @@ class Heart(db.Model):
 
     def is_flatlined(self):
         if self.cron != '':
-            return croniter(self.cron, self.last_pulse).get_next(datetime) + datetime.timedelta(seconds=self.threshold) < datetime.datetime.now()
+            return croniter(self.cron, self.last_pulse).get_next(datetime.datetime) + datetime.timedelta(seconds=self.threshold) < datetime.datetime.now()
         return self.last_pulse + datetime.timedelta(seconds=self.threshold*2) < datetime.datetime.now()
 
 
