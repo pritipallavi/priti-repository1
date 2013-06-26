@@ -108,7 +108,9 @@ function HeartCtrl ($scope, $http, $routeParams) {
         $scope.flatlines = result.flatlines.map(function(f) {
             f.duration = f.end != 'None' ? moment(f.end).from(moment(f.start), true) : 'On going';
             f.start = moment.utc(f.start).local().format('YYYY-MM-DD HH:mm');
-            f.end = moment.utc(f.end).local().format('YYYY-MM-DD HH:mm');
+            if(f.end != 'None'){
+                f.end = moment.utc(f.end).local().format('YYYY-MM-DD HH:mm');
+            }
             return f;
         });
         $scope.error = false;
