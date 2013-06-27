@@ -30,8 +30,6 @@ var seticon = function(alert) {
 };
 
 
-var pubnub = PUBNUB.init({ subscribe_key : 'sub-c-c8c9e356-df06-11e2-95e6-02ee2ddab7fe' });
-
 
 
 function HeartListCtrl ($scope, $http, $routeParams) {
@@ -104,6 +102,8 @@ function OrganCtrl ($scope, $http, $routeParams) {
             seticon($scope.flatlines.length);
         });
     }
+
+    var pubnub = PUBNUB.init({ subscribe_key : 'sub-c-c8c9e356-df06-11e2-95e6-02ee2ddab7fe',  ssl  : true });
 
     pubnub.subscribe({
         channel : "remotex-alerts",
