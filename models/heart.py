@@ -22,6 +22,9 @@ class Heart(db.Model):
         return Flatline.all().ancestor(self.key()).filter("active =", True).get()
 
     def checkFlatLine(self):
+        if self.threshold == 0 or self.cron == '':
+            return
+
         active = self.getActiveFlatline()
         if active is not None:
             return

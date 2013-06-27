@@ -1,4 +1,4 @@
 cron:
 - description: check for flatlines
   url: /checkforflatlines
-  schedule: every 2 minutes
+  schedule: every 5 minutes

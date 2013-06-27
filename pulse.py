@@ -3,6 +3,7 @@
 import webapp2
 from models.organization import Organization
 from models.heart import Heart
+import datetime
 
 
 class PulseHandler(webapp2.RequestHandler):
@@ -19,7 +20,7 @@ class PulseHandler(webapp2.RequestHandler):
 
 class CheckForFlatlineHandler(webapp2.RequestHandler):
     def get(self):
-        hearts = Heart.all().filter('threshold >', 0).fetch(5000)
+        hearts = Heart.all().filter('last_pulse <', datetime.datetime.utcnow() - datetime.timedelta(minutes=5)).fetch(5000)
         for heart in hearts:
             heart.checkFlatLine()
         self.response.write('ok')
