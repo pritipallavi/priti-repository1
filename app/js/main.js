@@ -15,6 +15,25 @@ config(function($locationProvider, $routeProvider) {
 
 
 
+var seticon = function(alert) {
+    var element = document.getElementById("favicon");
+    if(element){
+        element.parentNode.removeChild(element);
+    }
+    var link = document.createElement('link');
+    link.id = 'favicon';
+    link.type = 'image/x-icon';
+    link.rel = 'shortcut icon';
+    link.href = alert ? '/app/img/favicon-red.ico' : '/app/img/favicon.ico';
+
+    document.getElementsByTagName('head')[0].appendChild(link);
+};
+
+
+var pubnub = PUBNUB.init({ subscribe_key : 'sub-c-c8c9e356-df06-11e2-95e6-02ee2ddab7fe' });
+
+
+
 function HeartListCtrl ($scope, $http, $routeParams) {
     $http.get("/api/organizations/"+$routeParams.organization+'/hearts').success(function(result) {
         $scope.title = result.title;
@@ -70,6 +89,28 @@ function DetailsCtrl ($scope, $http, $routeParams) {
 }
 
 function OrganCtrl ($scope, $http, $routeParams) {
+
+    function recieved_message (message) {
+        console.log(message);
+        $scope.$apply(function  () {
+
+            if(message.flatline == "resuscitated"){
+                $scope.flatlines = $scope.flatlines.filter(function(f) {
+                    return f.heart != message.heart;
+                });
+            } else {
+                $scope.flatlines.push({heart:message.heart, title: message.heart, start: message.start, how_long: moment.utc(message.start).fromNow()});
+            }
+            seticon($scope.flatlines.length);
+        });
+    }
+
+    pubnub.subscribe({
+        channel : "remotex-alerts",
+        message : recieved_message
+    });
+
+
     $scope.organization = $routeParams.organization;
     $http.get("/api/organizations/"+$routeParams.organization).success(function(result) {
         $scope.title = result.title;
@@ -78,9 +119,17 @@ function OrganCtrl ($scope, $http, $routeParams) {
             return f;
         });
         $scope.newhearts = result.newhearts;
+        seticon($scope.flatlines.length);
     });
     $scope.flatlines = [];
     $scope.newhearts = [];
+
+    setInterval( function  () {
+        $scope.$apply(function  () {
+           for (var i = 0; i < $scope.flatlines.length; i++) {
+               $scope.flatlines[i].how_long = moment.utc($scope.flatlines[i].start).fromNow();
+           }});
+    }, 10000);
 }
 
 function HeartCtrl ($scope, $http, $routeParams) {

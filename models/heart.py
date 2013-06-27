@@ -48,4 +48,5 @@ class Flatline(db.Model):
         self.active = False
         self.end = datetime.datetime.now()
         resuscitate_mail(self.parent())
+
         self.put()
