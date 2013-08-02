@@ -61,7 +61,7 @@ class HeartHandler(webapp2.RequestHandler):
         heart = Heart.get_by_key_name(key, parent=org)
         flatlines = Flatline.all().ancestor(heart).order("-start").fetch(10)
         self.response.headers['Content-Type'] = 'application/json'
-        self.response.out.write(json.dumps({'title': heart.title or heart.key().id_or_name(), 'cron': heart.cron, 'threshold': heart.threshold, 'last_pulse': str(heart.last_pulse), 'flatlines': map(lambda f: {'start': str(f.start), 'end': str(f.end), 'active': str(f.active)}, flatlines)}))
+        self.response.out.write(json.dumps({'title': heart.title or heart.key().id_or_name(), 'time_zone': heart.time_zone, 'cron': heart.cron, 'threshold': heart.threshold, 'last_pulse': str(heart.last_pulse), 'flatlines': map(lambda f: {'start': str(f.start), 'end': str(f.end), 'active': str(f.active)}, flatlines)}))
 
     def put(self):
         payload = json.loads(self.request.body)
@@ -72,6 +72,7 @@ class HeartHandler(webapp2.RequestHandler):
         heart.title = str(payload['title'])
         heart.threshold = int(payload['threshold'])
         heart.cron = str(payload['cron'])
+        heart.time_zone = str(payload['time_zone'])
         croniter(heart.cron)
         heart.put()
 

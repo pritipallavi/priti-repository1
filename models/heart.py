@@ -1,7 +1,8 @@
 from google.appengine.ext import db
-import datetime
+from datetime import datetime, timedelta
 from models import resuscitate_mail, flatline_mail
 from lib.croniter import croniter
+from pytz.gae import pytz
 
 
 class Heart(db.Model):
@@ -10,12 +11,13 @@ class Heart(db.Model):
     last_pulse = db.DateTimeProperty(auto_now_add=True)
     threshold = db.IntegerProperty(default=0)
     cron = db.StringProperty(default='')
+    time_zone = db.StringProperty(default='UTC')
 
     def registerPulse(self):
         flatline = self.getActiveFlatline()
         if flatline is not None:
             flatline.resuscitate()
-        self.last_pulse = datetime.datetime.now()
+        self.last_pulse = datetime.now()
         self.put()
 
     def getActiveFlatline(self):
@@ -37,9 +39,18 @@ class Heart(db.Model):
         flatline_mail(self)
 
     def is_flatlined(self):
-        if self.cron != '':
-            return croniter(self.cron, self.last_pulse).get_next(datetime.datetime) + datetime.timedelta(seconds=self.threshold) < datetime.datetime.utcnow()
-        return self.last_pulse + datetime.timedelta(seconds=self.threshold*2) < datetime.datetime.utcnow()
+        if self.cron == '':
+            return self.last_pulse + timedelta(seconds=self.threshold*2) < datetime.utcnow()
+
+        if self.time_zone is None:
+            self.time_zone = 'UTC'
+
+        local_time_zone = pytz.timezone(self.time_zone)
+        last_pulse_local = local_time_zone.localize(self.last_pulse)
+        offset = timedelta(seconds=self.threshold)
+        next_date = croniter(self.cron, last_pulse_local).get_next(datetime)
+
+        return pytz.utc.localize(next_date) + offset < pytz.utc.localize(datetime.utcnow())
 
 
 class Flatline(db.Model):
@@ -49,7 +60,7 @@ class Flatline(db.Model):
 
     def resuscitate(self):
         self.active = False
-        self.end = datetime.datetime.now()
+        self.end = datetime.now()
         resuscitate_mail(self.parent())
 
         self.put()
