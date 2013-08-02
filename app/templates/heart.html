@@ -28,6 +28,16 @@
 				</div>
 			</div>
 			<div class="control-group">
+				<label class="control-label" for="cron">Timezone</label>
+				<div class="controls">
+					<select id='timezone' ng-model="time_zone">
+						<option>Europe/Stockholm</option>
+						<option>UTC</option>
+					</select>
+					
+				</div>
+			</div>
+			<div class="control-group">
 				<label class="control-label" for="cron">Cron Schedule</label>
 				<div class="controls">
 					<input type="text" id="cron" required ng-model="cron" ng-change='updateScheduleInfo()'><span class="help-inline"><a href='https://en.wikipedia.org/wiki/Cron#Format'><i class="icon icon-ban-circle" ng-hide='valid'></i> * * * * * format.</a></span>

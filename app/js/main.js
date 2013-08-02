@@ -153,6 +153,7 @@ function HeartCtrl ($scope, $http, $routeParams) {
         $scope.title = result.title;
         $scope.cron = result.cron;
         $scope.last_pulse = result.last_pulse;
+        $scope.time_zone = result.time_zone;
         $scope.updateScheduleInfo();
         $scope.flatlines = result.flatlines.map(function(f) {
             f.duration = f.end != 'None' ? moment(f.end).from(moment(f.start), true) : 'On going';
@@ -168,7 +169,7 @@ function HeartCtrl ($scope, $http, $routeParams) {
     $scope.save = function() {
         $scope.saving = true;
         $scope.saved = false;
-        $http.put("/api/organizations/"+$routeParams.organization+"/hearts/"+$routeParams.heart, {title:$scope.title, threshold:$scope.threshold, cron: $scope.cron}).success(function(result) {
+        $http.put("/api/organizations/"+$routeParams.organization+"/hearts/"+$routeParams.heart, {title:$scope.title, threshold:$scope.threshold, cron: $scope.cron, time_zone: $scope.time_zone}).success(function(result) {
             $scope.saved = true;
             $scope.saving = false;
             $scope.error = false;
