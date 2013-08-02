@@ -46,8 +46,8 @@ class Heart(db.Model):
             self.time_zone = 'UTC'
 
         local_time_zone = pytz.timezone(self.time_zone)
-        last_pulse_local = local_time_zone.localize(self.last_pulse)
         offset = timedelta(seconds=self.threshold)
+        last_pulse_local = local_time_zone.localize(self.last_pulse) - offset
         next_date = croniter(self.cron, last_pulse_local).get_next(datetime)
 
         return pytz.utc.localize(next_date) + offset < pytz.utc.localize(datetime.utcnow())
