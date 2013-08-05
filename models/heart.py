@@ -47,10 +47,10 @@ class Heart(db.Model):
 
         local_time_zone = pytz.timezone(self.time_zone)
         offset = timedelta(seconds=self.threshold)
-        last_pulse_local = local_time_zone.localize(self.last_pulse)
+        last_pulse_local = pytz.utc.localize(self.last_pulse).astimezone(local_time_zone)
         next_date = croniter(self.cron, last_pulse_local).get_next(datetime)
 
-        return pytz.utc.localize(next_date) + offset < pytz.utc.localize(datetime.utcnow())
+        return local_time_zone.localize(next_date).astimezone(pytz.utc) + offset < pytz.utc.localize(datetime.utcnow())
 
 
 class Flatline(db.Model):
