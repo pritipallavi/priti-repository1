@@ -11,6 +11,9 @@ class PulseHandler(webapp2.RequestHandler):
 
         id = self.request.get_all('id')[0]
         org = int(self.request.get_all('org')[0])
+        if id.find('\\') > 0:
+            self.response.write('key must not contain backslash')
+            return
 
         h = Organization.get_by_id(org).get_heart(id)
         h.registerPulse()
