@@ -50,6 +50,9 @@ class Heart(db.Model):
         last_pulse_local = pytz.utc.localize(self.last_pulse).astimezone(local_time_zone)
         next_date = croniter(self.cron, last_pulse_local).get_next(datetime)
 
+        if  local_time_zone.localize(next_date).astimezone(pytz.utc) > pytz.utc.localize(datetime.utcnow()) - offset:
+            return False
+
         return local_time_zone.localize(next_date).astimezone(pytz.utc) + offset < pytz.utc.localize(datetime.utcnow())
 
 
