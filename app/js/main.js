@@ -189,4 +189,15 @@ function HeartCtrl ($scope, $http, $routeParams) {
             $scope.error = true;
         });
     };
+    $scope.delete = function() {
+        $scope.saving = true;
+        $scope.saved = false;
+        $http.delete("/api/organizations/"+$routeParams.organization+"/hearts/"+$routeParams.heart).success(function(result) {
+            $scope.saved = true;
+            $scope.saving = false;
+            $scope.error = false;
+        }).error(function() {
+            $scope.error = true;
+        });
+    };
 }

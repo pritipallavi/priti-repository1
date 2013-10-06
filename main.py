@@ -84,6 +84,13 @@ class HeartHandler(webapp2.RequestHandler):
         croniter(heart.cron)
         heart.put()
 
+    def delete(self):
+        id = int(self.request.url.rsplit('/', 3)[1])
+        org = Organization.get_by_id(id)
+        key = self.request.url.rsplit('/', 1)[1]
+        heart = Heart.get_by_key_name(key, parent=org)
+        heart.delete()
+
 
 class InvitationHandler(webapp2.RequestHandler):
     def get(self):
