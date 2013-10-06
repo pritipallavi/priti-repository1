@@ -49,8 +49,16 @@ class SummaryHandler(webapp2.RequestHandler):
             'title': org.title,
             'newhearts': map(indextransform, newhearts),
             'flatlines': map(flatlinetransform, flatlines),
-            'users': org.users
+            'users': org.users,
+            'alert_email' : org.alert_email
         }))
+    def put(self):
+        payload = json.loads(self.request.body)
+        id = int(self.request.url.rsplit('/', 1)[1])
+        org = Organization.get_by_id(id)
+        org.title = str(payload['title'])
+        org.alert_email = str(payload['alert_email'])
+        org.put()
 
 
 class HeartHandler(webapp2.RequestHandler):

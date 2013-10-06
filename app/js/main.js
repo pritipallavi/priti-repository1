@@ -76,12 +76,24 @@ function DetailsCtrl ($scope, $http, $routeParams) {
     $http.get("/api/organizations/"+$routeParams.organization).success(function(result) {
         $scope.title = result.title;
         $scope.users = result.users;
+        $scope.alert_email = result.alert_email;
     });
     $scope.send = function() {
         $scope.sending = true;
         $http.post('/api/invitations/', {organization: $routeParams.organization, email: $scope.email}).success(function() {
             $scope.sent = true;
             $scope.sending = false;
+        });
+    };
+    $scope.save = function() {
+        $scope.saving = true;
+        $scope.saved = false;
+        $http.put("/api/organizations/"+$routeParams.organization, {title:$scope.title, alert_email:$scope.alert_email}).success(function(result) {
+            $scope.saved = true;
+            $scope.saving = false;
+            $scope.error = false;
+        }).error(function() {
+            $scope.error = true;
         });
     };
 }

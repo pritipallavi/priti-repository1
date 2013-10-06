@@ -7,6 +7,7 @@ from models import invite_mail
 class Organization(db.Model):
     title = db.StringProperty()
     users = db.StringListProperty()
+    alert_email = db.EmailProperty()
 
     def get_heart(self, id):
         return Heart.get_or_insert(id, parent=self)
