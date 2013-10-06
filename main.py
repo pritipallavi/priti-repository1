@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import webapp2
 import json
+from google.appengine.ext import db
 from google.appengine.api import users
 from models.organization import Organization, Invitation
 from models.heart import Heart, Flatline
@@ -89,7 +90,10 @@ class HeartHandler(webapp2.RequestHandler):
         org = Organization.get_by_id(id)
         key = self.request.url.rsplit('/', 1)[1]
         heart = Heart.get_by_key_name(key, parent=org)
+        flatlines = Flatline.all(keys_only=True).ancestor(heart).order("-start")
         heart.delete()
+        for f in flatlines:
+            db.delete(f)
 
 
 class InvitationHandler(webapp2.RequestHandler):

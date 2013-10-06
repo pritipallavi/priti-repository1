@@ -196,6 +196,7 @@ function HeartCtrl ($scope, $http, $routeParams) {
             $scope.saved = true;
             $scope.saving = false;
             $scope.error = false;
+            window.location.pathname = "/app/organizations/"+$routeParams.organization;
         }).error(function() {
             $scope.error = true;
         });
