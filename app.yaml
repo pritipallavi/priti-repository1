@@ -1,0 +1,65 @@
+application: <APPLICATIONNAME>
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: yes
+
+builtins:
+- remote_api: on
+
+handlers:
+- url: /favicon\.ico
+  static_files: favicon.ico
+  upload: favicon\.ico
+
+- url: /api.*
+  script: main.app
+  login: required
+
+- url: /pulse.*
+  script: pulse.app
+
+- url: /checkforflatlines
+  script: pulse.app
+  login: admin
+
+- url: /css
+  static_dir: landing/css
+
+- url: /js
+  static_dir: landing/js
+
+- url: /images
+  static_dir: landing/images
+
+- url: /
+  static_files: landing/index.html
+  upload: landing/index\.html
+
+
+- url: /app/css
+  static_dir: app/css
+
+- url: /app/js
+  static_dir: app/js
+
+- url: /app/img
+  static_dir: app/img
+
+- url: /app/templates
+  static_dir: app/templates
+
+- url: /app.*
+  static_files: app/index.html
+  upload: app/index\.html
+  login: required
+  secure: always
+
+- url: /(.*\.html)
+  static_files: landing/\1
+  upload: landing/.*\.html
+
+
+libraries:
+- name: webapp2
+  version: "2.5.2"
