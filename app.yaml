@@ -16,6 +16,9 @@ handlers:
   script: main.app
   login: required
 
+- url: /summaries.*
+  script: summary.app
+
 - url: /pulse.*
   script: pulse.app
 
