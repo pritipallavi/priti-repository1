@@ -130,6 +130,7 @@ function OrganCtrl ($scope, $http, $routeParams) {
             f.how_long = moment.utc(f.start).fromNow();
             return f;
         });
+        $scope.availablility = result.availablility;
         $scope.newhearts = result.newhearts;
         seticon($scope.flatlines.length);
     });

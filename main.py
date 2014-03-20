@@ -6,6 +6,7 @@ from google.appengine.api import users
 from models.organization import Organization, Invitation
 from models.heart import Heart, Flatline
 from lib.croniter import croniter
+from datetime import datetime, timedelta
 
 
 def indextransform(org):
@@ -45,14 +46,21 @@ class SummaryHandler(webapp2.RequestHandler):
         org = Organization.get_by_id(id)
         newhearts = Heart.all().ancestor(org.key()).filter('title =', '').fetch(2000)
         flatlines = Flatline.all().filter("active =", True).fetch(2000)
+        hearts = Heart.all().ancestor(org.key()).filter('title !=', '').count()
+        flatlines = Flatline.all().filter("start <", datetime.utcnow() - timedelta(days=-7)).fetch(2000)
+        alltime = hearts*24*60*60*7 if hearts > 0 else 1
+        downtime = sum(map(lambda x: x.seconds, map(lambda x: (x.end if x.end is not None else datetime.utcnow()) - x.start,flatlines)))
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(json.dumps({
             'title': org.title,
             'newhearts': map(indextransform, newhearts),
             'flatlines': map(flatlinetransform, flatlines),
             'users': org.users,
-            'alert_email' : org.alert_email
+            'alert_email' : org.alert_email,
+            'availablility' : 1 - float(downtime)/alltime,
+            'downtime' : downtime
         }))
+
     def put(self):
         payload = json.loads(self.request.body)
         id = int(self.request.url.rsplit('/', 1)[1])
@@ -60,7 +68,6 @@ class SummaryHandler(webapp2.RequestHandler):
         org.title = str(payload['title'])
         org.alert_email = str(payload['alert_email'])
         org.put()
-
 
 class HeartHandler(webapp2.RequestHandler):
     def get(self):

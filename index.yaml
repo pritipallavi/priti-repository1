@@ -27,3 +27,8 @@ indexes:
   properties:
   - name: created
     direction: desc
+
+- kind: Heart
+  ancestor: yes
+  properties:
+  - name: title
