@@ -46,10 +46,13 @@ class SummaryHandler(webapp2.RequestHandler):
         org = Organization.get_by_id(id)
         newhearts = Heart.all().ancestor(org.key()).filter('title =', '').fetch(2000)
         flatlines = Flatline.all().filter("active =", True).fetch(2000)
+        rangestart = datetime.utcnow() - timedelta(days=-7)
         hearts = Heart.all().ancestor(org.key()).filter('title !=', '').count()
-        flatlines = Flatline.all().filter("start <", datetime.utcnow() - timedelta(days=-7)).fetch(2000)
+        oldflatlines = Flatline.all().filter("start <", rangestart).fetch(2000)
+        oldflatlinesactive = Flatline.all().filter("end >", rangestart).fetch(2000)
+        oldflatlines = list(set(oldflatlines) | set(oldflatlinesactive)) 
         alltime = hearts*24*60*60*7 if hearts > 0 else 1
-        downtime = sum(map(lambda x: x.seconds, map(lambda x: (x.end if x.end is not None else datetime.utcnow()) - x.start,flatlines)))
+        downtime = sum(map(lambda x: x.seconds, map(lambda x: (x.end if x.end is not None else datetime.utcnow()) - x.start if x.start < rangestart else rangestart,oldflatlines)))
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(json.dumps({
             'title': org.title,
