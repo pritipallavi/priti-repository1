@@ -192,7 +192,8 @@ function HeartCtrl ($scope, $http, $routeParams) {
                 f.end = moment.utc(f.end).local().format('YYYY-MM-DD HH:mm');
             }
             return f;
-        });
+        }).sort(function(a,b){return a.start-b.start;});
+        $scope.flatcount = $scope.flatlines.length;
         $scope.error = false;
     });
 
