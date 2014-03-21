@@ -69,7 +69,7 @@ class ReportHandler(webapp2.RequestHandler):
        def get(self):
         id = int(self.request.url.rsplit('/', 2)[1])
         org = Organization.get_by_id(id)
-        rangestart = datetime.utcnow() - timedelta(days=-7)
+        rangestart = datetime.utcnow() - timedelta(days=7)
         hearts = Heart.all().ancestor(org.key()).filter('title !=', '').count()
         oldflatlines = Flatline.all().filter("start >", rangestart).fetch(2000)
         oldflatlinesactive = Flatline.all().filter("end >", rangestart).fetch(2000)
