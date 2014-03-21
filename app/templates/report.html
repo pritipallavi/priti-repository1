@@ -1,0 +1,46 @@
+<div class="row">
+	<div class="span12">
+		<div class="page-header">
+			<h2>Report for {{title}}</h2>
+		</div>
+		<p>Uptime and availablity last 7 days</p>
+	</div>
+</div>
+
+<div class="row" >
+	<div class="span4 alert">
+		<center><i>Availability last 7 days</i></center>
+		<center><h2>{{availablility}}</h2></center>
+	</div>
+	<div class="span4 alert">
+		<center><i>Hearts being monitored</i></center>
+		<center><h2>{{hearts}}</h2></center>
+	</div>
+</div>
+
+<div class="row" >
+	<div class="span12">
+		<div class="page-header"><h4>Flatlines during period</h4></div>
+	</div>
+</div>
+
+<div class="row" >
+	<div class="span12">
+		<table class="table">
+			<thead>
+				<th>Title</th>
+				<th>Start</th>
+				<th>End</th>
+				<th>Duration</th>
+			</thead>
+			<tbody>
+				<tr ng-repeat="flat in flatlines">
+					<td>{{flat.title}}</td>
+					<td>{{flat.start}}</td>
+					<td>{{flat.end}}</td>
+					<td>{{flat.duration}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>

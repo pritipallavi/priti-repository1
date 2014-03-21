@@ -18,6 +18,8 @@ def indextransform(org):
 
 def flatlinetransform(f):
     return {
+        'end': str(f.end),
+        'active': str(f.active),
         'start': str(f.start),
         'heart': f.parent().key().id_or_name(),
         'title': f.parent().title
@@ -46,13 +48,6 @@ class SummaryHandler(webapp2.RequestHandler):
         org = Organization.get_by_id(id)
         newhearts = Heart.all().ancestor(org.key()).filter('title =', '').fetch(2000)
         flatlines = Flatline.all().filter("active =", True).fetch(2000)
-        rangestart = datetime.utcnow() - timedelta(days=-7)
-        hearts = Heart.all().ancestor(org.key()).filter('title !=', '').count()
-        oldflatlines = Flatline.all().filter("start <", rangestart).fetch(2000)
-        oldflatlinesactive = Flatline.all().filter("end >", rangestart).fetch(2000)
-        oldflatlines = list(set(oldflatlines) | set(oldflatlinesactive)) 
-        alltime = hearts*24*60*60*7 if hearts > 0 else 1
-        downtime = sum(map(lambda x: x.seconds, map(lambda x: (x.end if x.end is not None else datetime.utcnow()) - x.start if x.start < rangestart else rangestart,oldflatlines)))
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(json.dumps({
             'title': org.title,
@@ -60,8 +55,6 @@ class SummaryHandler(webapp2.RequestHandler):
             'flatlines': map(flatlinetransform, flatlines),
             'users': org.users,
             'alert_email' : org.alert_email,
-            'availablility' : 1 - float(downtime)/alltime,
-            'downtime' : downtime
         }))
 
     def put(self):
@@ -72,6 +65,26 @@ class SummaryHandler(webapp2.RequestHandler):
         org.alert_email = str(payload['alert_email'])
         org.put()
 
+class ReportHandler(webapp2.RequestHandler):
+       def get(self):
+        id = int(self.request.url.rsplit('/', 2)[1])
+        org = Organization.get_by_id(id)
+        rangestart = datetime.utcnow() - timedelta(days=-7)
+        hearts = Heart.all().ancestor(org.key()).filter('title !=', '').count()
+        oldflatlines = Flatline.all().filter("start <", rangestart).fetch(2000)
+        oldflatlinesactive = Flatline.all().filter("end >", rangestart).fetch(2000)
+        oldflatlines = list(set(oldflatlines) | set(oldflatlinesactive)) 
+        alltime = hearts*24*60*60*7 if hearts > 0 else 1
+        downtime = sum(map(lambda x: x.seconds, map(lambda x: (x.end if x.end is not None else datetime.utcnow()) - x.start if x.start < rangestart else rangestart,oldflatlines)))
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.out.write(json.dumps({
+            'title': org.title,
+            'flatlines': map(flatlinetransform, oldflatlines),
+            'availablility' : 1 - float(downtime)/alltime,
+            'downtime' : downtime,
+            'hearts': hearts
+        }))
+
 class HeartHandler(webapp2.RequestHandler):
     def get(self):
         id = int(self.request.url.rsplit('/', 3)[1])
@@ -80,7 +93,7 @@ class HeartHandler(webapp2.RequestHandler):
         heart = Heart.get_by_key_name(key, parent=org)
         flatlines = Flatline.all().ancestor(heart).order("-start").fetch(10)
         self.response.headers['Content-Type'] = 'application/json'
-        self.response.out.write(json.dumps({'title': heart.title or heart.key().id_or_name(), 'time_zone': heart.time_zone, 'cron': heart.cron, 'threshold': heart.threshold, 'last_pulse': str(heart.last_pulse), 'flatlines': map(lambda f: {'start': str(f.start), 'end': str(f.end), 'active': str(f.active)}, flatlines)}))
+        self.response.out.write(json.dumps({'title': heart.title or heart.key().id_or_name(), 'time_zone': heart.time_zone, 'cron': heart.cron, 'threshold': heart.threshold, 'last_pulse': str(heart.last_pulse), 'flatlines': map(flatlinetransform, flatlines)}))
 
     def put(self):
         payload = json.loads(self.request.body)
@@ -151,6 +164,7 @@ class HeartsListHandler(webapp2.RequestHandler):
 
 app = webapp2.WSGIApplication([
     ('/api/me/organizations', OrganizationHandler),
+    ('/api/organizations/.*/report', ReportHandler),
     ('/api/organizations/.*/hearts/.+', HeartHandler),
     ('/api/organizations/.*/hearts', HeartsListHandler),
     ('/api/invitations/.*/accept', InvitationAcceptHandler),

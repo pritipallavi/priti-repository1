@@ -5,6 +5,7 @@ config(function($locationProvider, $routeProvider) {
     when('/app/', {controller:ListCtrl, templateUrl:'/app/templates/list.html'}).
     when('/app/organizations/:organization/config', {controller:DetailsCtrl, templateUrl:'/app/templates/config.html'}).
     when('/app/organizations/:organization', {controller:OrganCtrl, templateUrl:'/app/templates/organization.html'}).
+    when('/app/organizations/:organization/report', {controller:ReportCtrl, templateUrl:'/app/templates/report.html'}).
     when('/app/organizations/:organization/hearts', {controller:HeartListCtrl, templateUrl:'/app/templates/heartlist.html'}).
     when('/app/organizations/:organization/hearts/:heart', {controller:HeartCtrl, templateUrl:'/app/templates/heart.html'}).
     when('/app/invitations/:invite', {controller:InviteCtrl, templateUrl:'/app/templates/invite.html'}).
@@ -98,6 +99,23 @@ function DetailsCtrl ($scope, $http, $routeParams) {
     };
 }
 
+function ReportCtrl ($scope, $http, $routeParams) {
+    $scope.organization = $routeParams.organization;
+    $http.get("/api/organizations/"+$routeParams.organization+'/report').success(function(result) {
+        $scope.title = result.title;
+        $scope.availablility = result.availablility;
+        $scope.hearts = result.hearts;
+        $scope.flatlines = result.flatlines.map(function(f) {
+            f.duration = f.end != 'None' ? moment(f.end).from(moment(f.start), true) : 'On going';
+            f.start = moment.utc(f.start).local().format('YYYY-MM-DD HH:mm');
+            if(f.end != 'None'){
+                f.end = moment.utc(f.end).local().format('YYYY-MM-DD HH:mm');
+            }
+            return f;
+        });
+    });
+}
+
 function OrganCtrl ($scope, $http, $routeParams) {
 
     function recieved_message (message) {
@@ -130,7 +148,6 @@ function OrganCtrl ($scope, $http, $routeParams) {
             f.how_long = moment.utc(f.start).fromNow();
             return f;
         });
-        $scope.availablility = result.availablility;
         $scope.newhearts = result.newhearts;
         seticon($scope.flatlines.length);
     });
