@@ -11,14 +11,14 @@
 </div>
 
 <div class="row" >
-	<div class="span7 alert alert-info" ng-show="newhearts.length != 0">
+	<div class="span6 alert alert-info" ng-show="newhearts.length != 0">
 		<h2>New heartbeats</h2>
 		There are new hearts being monitorered, please take a moment to describe each.
 		<ul ng-repeat="heart in newhearts">
 			<li><a href="/app/organizations/{{organization}}/hearts/{{heart.key}}">{{heart.title}}</a></li>
 		</ul>
 	</div>
-	<div class="span7" ng-hide="newhearts.length != 0">&nbsp;</div>
+	<div class="span6" ng-hide="newhearts.length != 0">&nbsp;</div>
 	<div class="span4 alert">
 		<center><i>Availability last 7 days</i></center>
 		<center><h2>{{availablility}}</h2></center>
