@@ -14,6 +14,12 @@ def indextransform(org):
         'title': org.title or org.key().id_or_name(),
         'key': org.key().id_or_name(),
     }
+def maintenancetransform(heart):
+    return {
+        'title': heart.title or heart.key().id_or_name(),
+        'key': heart.key().id_or_name(),
+        'maintenance_day': str(heart.maintenance_day) if heart.maintenance_day is not None else ''
+    }
 
 
 def flatlinetransform(f):
@@ -47,12 +53,14 @@ class SummaryHandler(webapp2.RequestHandler):
         id = int(self.request.url.rsplit('/', 1)[1])
         org = Organization.get_by_id(id)
         newhearts = Heart.all().ancestor(org.key()).filter('title =', '').fetch(2000)
+        maintenancehearts = Heart.all().ancestor(org.key()).filter('maintenance_day !=', None).order('-maintenance_day').fetch(2000)
         flatlines = Flatline.all().filter("active =", True).fetch(2000)
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(json.dumps({
             'title': org.title,
             'newhearts': map(indextransform, newhearts),
             'flatlines': map(flatlinetransform, flatlines),
+            'maintenancehearts': map(maintenancetransform, maintenancehearts),
             'users': org.users,
             'alert_email' : org.alert_email,
         }))
@@ -91,9 +99,9 @@ class HeartHandler(webapp2.RequestHandler):
         org = Organization.get_by_id(id)
         key = self.request.url.rsplit('/', 1)[1]
         heart = Heart.get_by_key_name(key, parent=org)
-        flatlines = Flatline.all().ancestor(heart).order("-start").fetch(10)
+        flatlines = Flatline.all().ancestor(heart).order("-active").order("-start").fetch(10)
         self.response.headers['Content-Type'] = 'application/json'
-        self.response.out.write(json.dumps({'title': heart.title or heart.key().id_or_name(), 'time_zone': heart.time_zone, 'cron': heart.cron, 'threshold': heart.threshold, 'last_pulse': str(heart.last_pulse), 'flatlines': map(flatlinetransform, flatlines)}))
+        self.response.out.write(json.dumps({'organization': indextransform(org), 'title': heart.title or heart.key().id_or_name(), 'time_zone': heart.time_zone, 'cron': heart.cron, 'threshold': heart.threshold, 'last_pulse': str(heart.last_pulse), 'maintenance_day': str(heart.maintenance_day) if heart.maintenance_day is not None else '', 'flatlines': map(flatlinetransform, flatlines)}))
 
     def put(self):
         payload = json.loads(self.request.body)
@@ -103,10 +111,20 @@ class HeartHandler(webapp2.RequestHandler):
         heart = Heart.get_by_key_name(key, parent=org)
         heart.title = str(payload['title'])
         heart.threshold = int(payload['threshold'])
+        heart.maintenance_day = datetime.strptime(payload['maintenance_day'], '%Y-%m-%d').date() if len( payload['maintenance_day'] ) > 0 else None
         heart.cron = str(payload['cron'])
         heart.time_zone = str(payload['time_zone'])
         croniter(heart.cron)
         heart.put()
+
+        # Clear active flatline if today is maintenance day
+        if datetime.today().date() != heart.maintenance_day:
+            return
+        active_flatline = heart.getActiveFlatline()
+        if active_flatline is None:
+            return
+        active_flatline.active = False
+        active_flatline.put()
 
     def delete(self):
         id = int(self.request.url.rsplit('/', 3)[1])

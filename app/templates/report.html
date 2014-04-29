@@ -34,7 +34,7 @@
 				<th>Duration</th>
 			</thead>
 			<tbody>
-				<tr ng-repeat="flat in flatlines">
+				<tr class="heart-active-{{flat.active}}" ng-repeat="flat in flatlines">
 					<td>{{flat.title}}</td>
 					<td>{{flat.start}}</td>
 					<td>{{flat.end}}</td>

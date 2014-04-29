@@ -1,4 +1,4 @@
-angular.module('ekg', []).
+angular.module('ekg', ['ui.bootstrap']).
 config(function($locationProvider, $routeProvider) {
     $locationProvider.html5Mode(true);
     $routeProvider.
@@ -145,6 +145,7 @@ function OrganCtrl ($scope, $http, $routeParams) {
     $scope.organization = $routeParams.organization;
     $http.get("/api/organizations/"+$routeParams.organization).success(function(result) {
         $scope.title = result.title;
+        $scope.maintenancehearts = result.maintenancehearts;
         $scope.flatlines = result.flatlines.map(function(f) {
             f.how_long = moment.utc(f.start).fromNow();
             return f;
@@ -172,6 +173,13 @@ function HeartCtrl ($scope, $http, $routeParams) {
             var schedule = later.parse.cron($scope.cron);
             $scope.cron_guess = moment.utc(later.schedule(schedule).next(1, pulse_moment.toDate())).fromNow();
             $scope.cron_schedule_text = getPrettyCron(schedule.schedules[0]);
+            if( new Date($scope.maintenance_day).setHours(0,0,0,0) === new Date().setHours(0,0,0,0) ) {
+                $scope.today_is_maintenance_day = moment($scope.maintenance_day).format("[Important! Today,] YYYY-MM-DD[, is maintenance day]");
+                $scope.today_is_maintenance_day_note = "By making today a maintenance day will deactivate a flatline that are in progress for this heart!";
+            } else {
+                $scope.today_is_maintenance_day = "";
+                $scope.today_is_maintenance_day_note = "";
+            }
             $scope.valid = true;
         } catch(e){
             $scope.valid = false;
@@ -179,41 +187,47 @@ function HeartCtrl ($scope, $http, $routeParams) {
         $scope.threshold_text = moment.utc().add('seconds', $scope.threshold).fromNow();
     };
 
-    $http.get("/api/organizations/"+$routeParams.organization+"/hearts/"+$routeParams.heart).success(function(result) {
-        $scope.threshold = result.threshold;
-        $scope.title = result.title;
-        $scope.cron = result.cron;
-        $scope.last_pulse = result.last_pulse;
-        $scope.time_zone = result.time_zone;
-        $scope.updateScheduleInfo();
-        $scope.flatlines = result.flatlines.map(function(f) {
-            f.duration = f.end != 'None' ? moment(f.end).from(moment(f.start), true) : 'On going';
-            f.start = moment.utc(f.start).local().format('YYYY-MM-DD HH:mm');
-            if(f.end != 'None'){
-                f.end = moment.utc(f.end).local().format('YYYY-MM-DD HH:mm');
-            }
-            return f;
+    $scope.load = function() {
+        $http.get("/api/organizations/"+$routeParams.organization+"/hearts/"+$routeParams.heart).success(function(result) {
+            $scope.threshold = result.threshold;
+            $scope.organization = result.organization;
+            $scope.title = result.title;
+            $scope.cron = result.cron;
+            $scope.last_pulse = result.last_pulse;
+            $scope.time_zone = result.time_zone;
+            $scope.maintenance_day = result.maintenance_day;
+            $scope.updateScheduleInfo();
+            $scope.flatlines = result.flatlines.map(function(f) {
+                f.duration = f.end != 'None' ? moment(f.end).from(moment(f.start), true) : 'On going';
+                f.start = moment.utc(f.start).local().format('YYYY-MM-DD HH:mm');
+                if(f.end != 'None'){
+                    f.end = moment.utc(f.end).local().format('YYYY-MM-DD HH:mm');
+                }
+                return f;
+            });
+            $scope.error = false;
         });
-        $scope.error = false;
-    });
+    };
+    $scope.load();
 
     $scope.save = function() {
         $scope.saving = true;
         $scope.saved = false;
-        $http.put("/api/organizations/"+$routeParams.organization+"/hearts/"+$routeParams.heart, {title:$scope.title, threshold:$scope.threshold, cron: $scope.cron, time_zone: $scope.time_zone}).success(function(result) {
+        $http.put("/api/organizations/"+$routeParams.organization+"/hearts/"+$routeParams.heart, {title:$scope.title, threshold:$scope.threshold, cron: $scope.cron, time_zone: $scope.time_zone, maintenance_day: $scope.maintenance_day ? moment($scope.maintenance_day).format("YYYY-MM-DD") : ''}).success(function(result) {
             $scope.saved = true;
             $scope.saving = false;
             $scope.error = false;
+            $scope.load();
         }).error(function() {
             $scope.error = true;
         });
     };
     $scope.delete = function() {
-        $scope.saving = true;
-        $scope.saved = false;
+        $scope.deleting = true;
+        $scope.deleted = false;
         $http.delete("/api/organizations/"+$routeParams.organization+"/hearts/"+$routeParams.heart).success(function(result) {
-            $scope.saved = true;
-            $scope.saving = false;
+            $scope.deleted = true;
+            $scope.deleting = false;
             $scope.error = false;
             window.location.pathname = "/app/organizations/"+$routeParams.organization;
         }).error(function() {

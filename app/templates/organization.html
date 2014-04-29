@@ -32,8 +32,17 @@
 	</div>
 </div>
 
+<div class="row"  ng-show="maintainancehearts.length != 0">
+	<div class="span11 alert alert-info">
+		<h2>Maintenance</h2>
+		<p>Hearts currently marked for maintenance.</p>
+		<ul ng-repeat="heart in maintenancehearts">
+			<li><a href="/app/organizations/{{organization}}/hearts/{{heart.key}}">{{heart.title}} - {{heart.maintenance_day}}</a></li>
+		</ul>
+	</div>
+</div>
 
-<div class="row" ng-show="flatlines.length == 0">
+<div class="row" ng-show="flatlines.length == 0 && maintainancehearts.length == 0">
 	<div class="span11 alert alert-success">
 		<h2>Relax!</h2>
 		<p>Everything is reporting within expected ranges.</p>

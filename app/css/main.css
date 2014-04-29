@@ -5,6 +5,11 @@
    ========================================================================== */
 
 
+.heart-active-False {
+	text-decoration:line-through;
+	color: #909090;
+}
+
 h2 a {
 	text-decoration: none;
 	color: #333;

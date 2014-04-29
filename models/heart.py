@@ -12,6 +12,7 @@ class Heart(db.Model):
     threshold = db.IntegerProperty(default=0)
     cron = db.StringProperty(default='')
     time_zone = db.StringProperty(default='UTC')
+    maintenance_day = db.DateProperty(default=None)
 
     def registerPulse(self):
         flatline = self.getActiveFlatline()
@@ -46,6 +47,11 @@ class Heart(db.Model):
             self.time_zone = 'UTC'
 
         local_time_zone = pytz.timezone(self.time_zone)
+
+        # return false if today is maintenance day
+        if self.maintenance_day.strftime('%Y-%m-%d') == local_time_zone.localize(datetime.utcnow()).strftime('%Y-%m-%d'):
+            return False
+
         offset = timedelta(seconds=self.threshold)
 
         last_pulse_local = pytz.utc.localize(self.last_pulse).astimezone(local_time_zone)

@@ -11,6 +11,26 @@ indexes:
 # your application using appcfg.py.
 
 - kind: Flatline
+  properties:
+  - name: active
+  - name: threshold
+
+- kind: Flatline
+  ancestor: yes
+  properties:
+  - name: active
+  - name: start
+    direction: desc
+
+- kind: Flatline
+  ancestor: yes
+  properties:
+  - name: active
+    direction: desc
+  - name: start
+    direction: desc
+
+- kind: Flatline
   ancestor: yes
   properties:
   - name: end
@@ -26,6 +46,17 @@ indexes:
   ancestor: yes
   properties:
   - name: created
+    direction: desc
+
+- kind: Heart
+  ancestor: yes
+  properties:
+  - name: maintenance_day
+
+- kind: Heart
+  ancestor: yes
+  properties:
+  - name: maintenance_day
     direction: desc
 
 - kind: Heart
