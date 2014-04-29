@@ -1,7 +1,7 @@
 <div class="row">
 	<div class="span12">
 		<div class="page-header">
-			<h2>Hearts for {{title}}</h2>
+			<h2><a href="/app/organizations/{{organization.key}}">{{organization.title}}</a> &gt; Hearts</h2>
 		</div>
 		<p>Here is a list of {{hearts.length}} the hearts we are monitoring for you.</p>
 	</div>
@@ -16,7 +16,7 @@
 <div class="row" ng-show="hearts.length != 0">
 	<div class="span12">
 		<ul ng-repeat="heart in hearts">
-			<li><a href="/app/organizations/{{organization}}/hearts/{{heart.key}}">{{heart.title}}</a></li>
+			<li><a href="/app/organizations/{{organization.key}}/hearts/{{heart.key}}">{{heart.title}}</a></li>
 		</ul>
 	</div>
 </div>

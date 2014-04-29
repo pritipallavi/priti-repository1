@@ -78,7 +78,7 @@ class ReportHandler(webapp2.RequestHandler):
         downtime = sum(map(lambda x: x.seconds, map(lambda x: (x.end if x.end is not None else datetime.utcnow()) - (x.start if x.start < rangestart else rangestart),oldflatlines)))
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(json.dumps({
-            'title': org.title,
+            'organization': indextransform( org ),
             'flatlines': map(flatlinetransform, oldflatlines),
             'availablility' : 1 - float(downtime)/alltime,
             'downtime' : downtime,
@@ -157,7 +157,7 @@ class HeartsListHandler(webapp2.RequestHandler):
         hearts = Heart.all().ancestor(org.key()).order("-created").fetch(2000)
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(json.dumps({
-            'title': org.title,
+            'organization': indextransform( org ),
             'hearts': map(indextransform, hearts)
         }))
 

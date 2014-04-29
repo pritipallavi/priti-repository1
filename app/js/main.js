@@ -35,7 +35,7 @@ var seticon = function(alert) {
 
 function HeartListCtrl ($scope, $http, $routeParams) {
     $http.get("/api/organizations/"+$routeParams.organization+'/hearts').success(function(result) {
-        $scope.title = result.title;
+        $scope.organization = result.organization;
         $scope.hearts = result.hearts;
     });
     $scope.organization = $routeParams.organization;
@@ -102,7 +102,7 @@ function DetailsCtrl ($scope, $http, $routeParams) {
 function ReportCtrl ($scope, $http, $routeParams) {
     $scope.organization = $routeParams.organization;
     $http.get("/api/organizations/"+$routeParams.organization+'/report').success(function(result) {
-        $scope.title = result.title;
+        $scope.organization = result.organization;
         $scope.availablility = result.availablility;
         $scope.hearts = result.hearts;
         $scope.flatlines = result.flatlines.map(function(f) {

@@ -1,7 +1,7 @@
 <div class="row">
 	<div class="span12">
 		<div class="page-header">
-			<h2>{{title}}</h2>
+			<h2><a href="/app/organizations/{{organization}}">{{title}}</a> &gt; Configuration</h2>
 		</div>
 	</div>
 </div>
@@ -9,7 +9,7 @@
 
 <div class="row" >
 	<div class="span12">
-		<p>invite someone to this organization</p>
+		<p>Invite someone to this organization</p>
 		<div class="span11 input-append">
 			<form ng-submit="send()">
 				<input type="email" placeholder="Email address" required class="input-block-level" ng-model="email"><input type='submit' class="btn btn-primary" value="Invite"></input>
