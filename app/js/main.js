@@ -197,6 +197,7 @@ function HeartCtrl ($scope, $http, $routeParams) {
             $scope.title = result.title;
             $scope.cron = result.cron;
             $scope.last_pulse = result.last_pulse;
+            $scope.last_closed_by = result.last_closed_by;
             $scope.time_zone = result.time_zone;
             $scope.maintenance_day = result.maintenance_day;
             $scope.updateScheduleInfo();

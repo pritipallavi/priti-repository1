@@ -19,7 +19,7 @@ def heartlisttransform(heart):
         'title': heart.title or heart.key().id_or_name(),
         'key': heart.key().id_or_name(),
         'last_pulse': str(heart.last_pulse),
-        'last_closed_by': heart.last_closed_by if heart.last_closed_by is not None else '',
+        'last_closed_reason': heart.last_closed_reason if heart.last_closed_reason is not None else '',
         'active': True if heart.threshold != 0 else False,
         'maintenance_day': str(heart.maintenance_day) if heart.maintenance_day is not None else ''
     }
@@ -29,6 +29,7 @@ def flatlinetransform(f):
         'end': str(f.end),
         'active': f.active,
         'closed_reason': f.closed_reason,
+        'closed_by_user': f.closed_by_user,
         'start': str(f.start),
         'heart': f.parent().key().id_or_name(),
         'title': f.parent().title

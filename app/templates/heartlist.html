@@ -19,14 +19,14 @@
 			<thead>
 				<th>Name</th>
 				<th>Last Pulse</th>
-				<th>Last Flatline Closed By</th>
+				<th>Last Flatline Closed Reason</th>
 				<th>Maintenance Day</th>
 			</thead>
 			<tbody>
 				<tr ng:class="{'inactive-item' : !heart.active }" ng-repeat="heart in hearts">
 					<td><a href="/app/organizations/{{organization.key}}/hearts/{{heart.key}}">{{heart.title}}</a></td>
 					<td>{{heart.last_pulse}}</td>
-					<td>{{heart.last_closed_by}}</td>
+					<td>{{heart.last_closed_reason}}</td>
 					<td>{{heart.maintenance_day}}</td>
 				</tr>
 			</tbody>

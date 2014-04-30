@@ -1,4 +1,5 @@
 from google.appengine.ext import db
+from google.appengine.api import users
 from datetime import datetime, timedelta
 from models import resuscitate_mail, flatline_mail
 from lib.croniter import croniter
@@ -13,7 +14,7 @@ class Heart(db.Model):
     cron = db.StringProperty(default='')
     time_zone = db.StringProperty(default='UTC')
     maintenance_day = db.DateProperty(default=None)
-    last_closed_by = db.StringProperty(default='')
+    last_closed_reason = db.StringProperty(default='')
 
     def registerPulse(self):
         flatline = self.getActiveFlatline()
@@ -79,21 +80,23 @@ class Heart(db.Model):
         if active_flatline is None:
             return
         active_flatline.close()
+        self.last_closed_reason = active_flatline.closed_reason
         active_flatline.put()
-        
+
 
 class Flatline(db.Model):
     start = db.DateTimeProperty(auto_now_add=True)
     active = db.BooleanProperty(default=True)
     end = db.DateTimeProperty()
     closed_reason = db.StringProperty(default='')
+    closed_by_user = db.StringProperty(default='')
 
     def resuscitate(self):
         self.active = False
         self.end = datetime.now()
         self.closed_reason = "Pulse received"
         heart = self.parent()
-        heart.last_closed_by = self.closed_reason
+        heart.last_closed_reason = self.closed_reason
         resuscitate_mail(self.parent())
 
         heart.put()
@@ -103,8 +106,8 @@ class Flatline(db.Model):
         self.active = False
         self.end = datetime.now()
         self.closed_reason = "Maintenance"
-        heart = self.parent()
-        heart.last_closed_by = self.closed_reason
+        current_user = users.get_current_user()
+        if current_user:
+            self.closed_by_user = current_user.nickname()
 
-        heart.put()
         self.put()
