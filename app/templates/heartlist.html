@@ -25,9 +25,9 @@
 			<tbody>
 				<tr ng:class="{'inactive-item' : !heart.active }" ng-repeat="heart in hearts">
 					<td><a href="/app/organizations/{{organization.key}}/hearts/{{heart.key}}">{{heart.title}}</a></td>
-					<td>{{heart.last_pulse}}</td>
+					<td class="nowrap">{{heart.last_pulse}}</td>
 					<td>{{heart.last_closed_reason}}</td>
-					<td>{{heart.maintenance_day}}</td>
+					<td class="nowrap">{{heart.maintenance_day}}</td>
 				</tr>
 			</tbody>
 		</table>
