@@ -170,6 +170,8 @@ class HeartsListHandler(webapp2.RequestHandler):
         id = int(self.request.url.rsplit('/', 2)[1])
         org = Organization.get_by_id(id)
         hearts = Heart.all().ancestor(org.key()).order("-created").fetch(2000)
+        # Activate hearts before deactivated onces
+        hearts.sort( cmp=lambda x,y: -1 if x.threshold > 0 else 1 )
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(json.dumps({
             'organization': indextransform( org ),
