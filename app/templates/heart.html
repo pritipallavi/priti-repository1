@@ -9,7 +9,7 @@
 
 <div class="row" >
 	<div class="span12">
-		<p><i class="icon icon-time"></i> Last recorded hearbeat was {{last_pulse_text}}. <span><strong>{{today_is_maintenance_day}}</strong></span></p>
+		<p><i class="icon icon-time"></i> Last recorded heartbeat was {{last_pulse_text}}. <span><strong>{{today_is_maintenance_day}}</strong></span></p>
 		<p><i class="icon icon-time"></i> The expected schedule is: {{cron_schedule_text}}</p>
 		<p><i class="icon icon-time"></i> Meaning the next heartbeat should be {{cron_guess}}, if its hasnt pulsed within {{threshold_text}} I will raise a flatline and send emails.</p>
 
@@ -52,7 +52,7 @@
 			<div class="control-group">
 				<label class="control-label" for="maintenance_day">Maintenance</label>
 				<div class="controls">
-					<input type="text" id="maintenance_day" ng-model="maintenance_day" ng-change='updateScheduleInfo()' datepicker-popup="yyyy-MM-dd"><span class="help-inline">Date for the next maintainance window, when all flatlines should be ignored.<br/><span><strong>{{today_is_maintenance_day_note}}</strong></span></span>
+					<input type="text" id="maintenance_day" ng-model="maintenance_day" ng-change='updateScheduleInfo()' datepicker-popup="yyyy-MM-dd"><span class="help-inline">Date for the next maintenance window, when all flatlines should be ignored.<br/><span><strong>{{today_is_maintenance_day_note}}</strong></span></span>
 				</div>
 			</div>
 			<div class="control-group">
