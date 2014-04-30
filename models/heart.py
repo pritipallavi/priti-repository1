@@ -13,6 +13,7 @@ class Heart(db.Model):
     cron = db.StringProperty(default='')
     time_zone = db.StringProperty(default='UTC')
     maintenance_day = db.DateProperty(default=None)
+    last_closed_by = db.StringProperty(default='')
 
     def registerPulse(self):
         flatline = self.getActiveFlatline()
@@ -79,12 +80,7 @@ class Heart(db.Model):
             return
         active_flatline.close()
         active_flatline.put()
-
-    def get_last_closed_by(self):
-        last_flatline = Flatline.all().ancestor(self.key()).order("-end").get()
-        if last_flatline is None:
-            return
-        return last_flatline.closed_reason 
+        
 
 class Flatline(db.Model):
     start = db.DateTimeProperty(auto_now_add=True)
@@ -96,13 +92,19 @@ class Flatline(db.Model):
         self.active = False
         self.end = datetime.now()
         self.closed_reason = "Pulse received"
+        heart = self.parent()
+        heart.last_closed_by = self.closed_reason
         resuscitate_mail(self.parent())
 
+        heart.put()
         self.put()
 
     def close(self):
         self.active = False
         self.end = datetime.now()
         self.closed_reason = "Maintenance"
+        heart = self.parent()
+        heart.last_closed_by = self.closed_reason
 
+        heart.put()
         self.put()

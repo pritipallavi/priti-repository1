@@ -19,7 +19,7 @@ def heartlisttransform(heart):
         'title': heart.title or heart.key().id_or_name(),
         'key': heart.key().id_or_name(),
         'last_pulse': str(heart.last_pulse),
-        'last_closed_by': heart.get_last_closed_by(),
+        'last_closed_by': heart.last_closed_by if heart.last_closed_by is not None else '',
         'active': True if heart.threshold != 0 else False,
         'maintenance_day': str(heart.maintenance_day) if heart.maintenance_day is not None else ''
     }
