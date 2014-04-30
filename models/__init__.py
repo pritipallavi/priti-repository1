@@ -7,7 +7,7 @@ def resuscitate_mail(heart):
                                 subject=heart.title + " has a pulse again")
 
     org = heart.parent()
-    if org.alert_email is '' or org.alert_email is None:
+    if org.alert_email == '' or org.alert_email is None:
         message.to = map(lambda user: user, heart.parent().users)
     else:
         message.to = org.alert_email
@@ -52,7 +52,7 @@ def flatline_mail(heart):
                                 subject=heart.title + " has flatlined")
 
     org = heart.parent()
-    if org.alert_email is '' or org.alert_email is None:
+    if org.alert_email == '' or org.alert_email is None:
         message.to = map(lambda user: user, heart.parent().users)
     else:
         message.to = org.alert_email
