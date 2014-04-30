@@ -24,7 +24,7 @@
 if ((!moment || !later) && (typeof require !== 'undefined')) {
   var moment = require('moment');
   var later = require('later').later;
-  var cronParser = require('later').parse.cron;
+  var cronParser = require('later').later.parse.cron;
 }
 
 (function() {
@@ -175,7 +175,7 @@ if ((!moment || !later) && (typeof require !== 'undefined')) {
   var getNext = function(cronspec, sixth) {
     var schedule = cronParser(cronspec, sixth);
     return moment(
-        later(60, true).getNext(schedule)
+        later.schedule(schedule).next(60)
       ).calendar();
   };
 

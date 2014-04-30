@@ -173,9 +173,8 @@ function HeartCtrl ($scope, $http, $routeParams) {
         var pulse_moment = moment.utc($scope.last_pulse);
         $scope.last_pulse_text = pulse_moment.fromNow();
         try{
-            var schedule = later.parse.cron($scope.cron);
-            $scope.cron_guess = moment.utc(later.schedule(schedule).next(1, pulse_moment.toDate())).fromNow();
-            $scope.cron_schedule_text = getPrettyCron(schedule.schedules[0]);
+            $scope.cron_guess = prettyCron.getNext($scope.cron);
+            $scope.cron_schedule_text = prettyCron.toString($scope.cron);
             if( new Date($scope.maintenance_day).setHours(0,0,0,0) === new Date().setHours(0,0,0,0) ) {
                 $scope.today_is_maintenance_day = moment($scope.maintenance_day).format("[Important! Today,] YYYY-MM-DD[, is maintenance day]");
                 $scope.today_is_maintenance_day_note = "By making today a maintenance day will deactivate a flatline that are in progress for this heart!";
