@@ -49,7 +49,7 @@ class Heart(db.Model):
         local_time_zone = pytz.timezone(self.time_zone)
 
         # return false if today is maintenance day
-        if self.maintenance_day.strftime('%Y-%m-%d') == local_time_zone.localize(datetime.utcnow()).strftime('%Y-%m-%d'):
+        if self.maintenance_day is not None and self.maintenance_day.strftime('%Y-%m-%d') == local_time_zone.localize(datetime.utcnow()).strftime('%Y-%m-%d'):
             return False
 
         offset = timedelta(seconds=self.threshold)
@@ -68,15 +68,41 @@ class Heart(db.Model):
 
         return  next_date + offset < now
 
+    def check_maintenance(self):
+        # Clear active flatline if today is maintenance day
+        if datetime.today().date() != self.maintenance_day:
+            return
+        dayAfterMaintenanceDay = datetime.combine(datetime.today().date() + timedelta(days=1), datetime.min.time())
+        self.last_pulse = dayAfterMaintenanceDay
+        active_flatline = self.getActiveFlatline()
+        if active_flatline is None:
+            return
+        active_flatline.close()
+        active_flatline.put()
+
+    def get_last_closed_by(self):
+        last_flatline = Flatline.all().ancestor(self.key()).order("-end").get()
+        if last_flatline is None:
+            return
+        return last_flatline.closed_reason 
 
 class Flatline(db.Model):
     start = db.DateTimeProperty(auto_now_add=True)
     active = db.BooleanProperty(default=True)
     end = db.DateTimeProperty()
+    closed_reason = db.StringProperty(default='')
 
     def resuscitate(self):
         self.active = False
         self.end = datetime.now()
+        self.closed_reason = "Pulse received"
         resuscitate_mail(self.parent())
+
+        self.put()
+
+    def close(self):
+        self.active = False
+        self.end = datetime.now()
+        self.closed_reason = "Maintenance"
 
         self.put()

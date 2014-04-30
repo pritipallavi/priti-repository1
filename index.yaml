@@ -33,6 +33,16 @@ indexes:
 - kind: Flatline
   ancestor: yes
   properties:
+  - name: active
+    direction: desc
+  - name: start
+    direction: desc
+  - name: end
+    direction: desc
+
+- kind: Flatline
+  ancestor: yes
+  properties:
   - name: end
     direction: desc
 

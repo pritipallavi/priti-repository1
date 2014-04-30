@@ -36,7 +36,10 @@ var seticon = function(alert) {
 function HeartListCtrl ($scope, $http, $routeParams) {
     $http.get("/api/organizations/"+$routeParams.organization+'/hearts').success(function(result) {
         $scope.organization = result.organization;
-        $scope.hearts = result.hearts;
+        $scope.hearts = result.hearts.map(function(h) {
+            h.last_pulse = moment.utc(h.last_pulse).local().format('YYYY-MM-DD HH:mm');
+            return h;
+        });
     });
     $scope.organization = $routeParams.organization;
 }

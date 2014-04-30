@@ -5,8 +5,8 @@
    ========================================================================== */
 
 
-.heart-active-False {
-	text-decoration:line-through;
+.inactive-item {
+	font-style: italic;
 	color: #909090;
 }
 

@@ -92,12 +92,14 @@
 				<th>Start</th>
 				<th>End</th>
 				<th>Duration</th>
+				<th>Closed By</th>
 			</thead>
 			<tbody>
-				<tr class="heart-active-{{flat.active}}" ng-repeat="flat in flatlines">
+				<tr ng:class="{true: '', false: 'inactive-item'}[flat.active]" ng-repeat="flat in flatlines">
 					<td>{{flat.start}}</td>
 					<td>{{flat.end}}</td>
 					<td>{{flat.duration}}</td>
+					<td>{{flat.closed_reason}}</td>
 				</tr>
 			</tbody>
 		</table>
