@@ -83,6 +83,20 @@ class Heart(db.Model):
         self.last_closed_reason = active_flatline.closed_reason
         active_flatline.put()
 
+    def check_deactivation(self, threshold):
+        # Clear active flatline if threshold is set to zero
+        if threshold == self.threshold or threshold != 0:
+            return
+
+        current_user = users.get_current_user()
+        self.last_closed_reason = "Deactivated by " + current_user.nickname()
+
+        active_flatline = self.getActiveFlatline()
+        if active_flatline is None:
+            return
+        active_flatline.close()
+        active_flatline.put()
+
 
 class Flatline(db.Model):
     start = db.DateTimeProperty(auto_now_add=True)

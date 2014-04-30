@@ -114,6 +114,7 @@ class HeartHandler(webapp2.RequestHandler):
         key = self.request.url.rsplit('/', 1)[1]
         heart = Heart.get_by_key_name(key, parent=org)
         heart.title = str(payload['title'])
+        heart.check_deactivation(int(payload['threshold']))
         heart.threshold = int(payload['threshold'])
         heart.maintenance_day = datetime.strptime(payload['maintenance_day'], '%Y-%m-%d').date() if len( payload['maintenance_day'] ) > 0 else None
         heart.cron = str(payload['cron'])
