@@ -26,9 +26,9 @@ class HeartTestCase(unittest.TestCase):
 		heart.cron = "* * * * *"
 		heart.threshold = 1
 
-		flatlineBeforeCheck = heart.getActiveFlatline()
-		heart.checkFlatLine()
-		flatlineAfterCheck = heart.getActiveFlatline()
+		flatlineBeforeCheck = heart.get_active_flatline()
+		heart.check_flatLine()
+		flatlineAfterCheck = heart.get_active_flatline()
 
 		self.assertIsNone(flatlineBeforeCheck)
 		self.assertIsNotNone(flatlineAfterCheck)
@@ -38,9 +38,9 @@ class HeartTestCase(unittest.TestCase):
 		heart.cron = ""
 		heart.threshold = 1
 
-		flatlineBeforeCheck = heart.getActiveFlatline()
-		heart.checkFlatLine()
-		flatlineAfterCheck = heart.getActiveFlatline()
+		flatlineBeforeCheck = heart.get_active_flatline()
+		heart.check_flatLine()
+		flatlineAfterCheck = heart.get_active_flatline()
 
 		self.assertIsNone(flatlineBeforeCheck)
 		self.assertIsNone(flatlineAfterCheck)
@@ -50,9 +50,9 @@ class HeartTestCase(unittest.TestCase):
 		heart.cron = "* * * * *"
 		heart.threshold = 0
 
-		flatlineBeforeCheck = heart.getActiveFlatline()
-		heart.checkFlatLine()
-		flatlineAfterCheck = heart.getActiveFlatline()
+		flatlineBeforeCheck = heart.get_active_flatline()
+		heart.check_flatLine()
+		flatlineAfterCheck = heart.get_active_flatline()
 
 		self.assertIsNone(flatlineBeforeCheck)
 		self.assertIsNone(flatlineAfterCheck)

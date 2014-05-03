@@ -16,7 +16,7 @@ class PulseHandler(webapp2.RequestHandler):
             return
 
         h = Organization.get_by_id(org).get_heart(id)
-        h.registerPulse()
+        h.register_pulse()
 
         self.response.write('ok')
 
@@ -25,7 +25,7 @@ class CheckForFlatlineHandler(webapp2.RequestHandler):
     def get(self):
         hearts = Heart.all().filter('last_pulse <', datetime.datetime.utcnow() - datetime.timedelta(minutes=5)).fetch(5000)
         for heart in hearts:
-            heart.checkFlatLine()
+            heart.check_flatLine()
         self.response.write('ok')
 
 

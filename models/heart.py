@@ -16,21 +16,21 @@ class Heart(db.Model):
     maintenance_day = db.DateProperty(default=None)
     last_closed_reason = db.StringProperty(default='')
 
-    def registerPulse(self):
-        flatline = self.getActiveFlatline()
+    def register_pulse(self):
+        flatline = self.get_active_flatline()
         if flatline is not None:
             flatline.resuscitate()
         self.last_pulse = datetime.now()
         self.put()
 
-    def getActiveFlatline(self):
+    def get_active_flatline(self):
         return Flatline.all().ancestor(self.key()).filter("active =", True).get()
 
-    def checkFlatLine(self):
+    def check_flatLine(self):
         if self.threshold == 0 or self.cron == '':
             return
 
-        active = self.getActiveFlatline()
+        active = self.get_active_flatline()
         if active is not None:
             return
 
@@ -76,7 +76,7 @@ class Heart(db.Model):
             return
         dayAfterMaintenanceDay = datetime.combine(datetime.today().date() + timedelta(days=1), datetime.min.time())
         self.last_pulse = dayAfterMaintenanceDay
-        active_flatline = self.getActiveFlatline()
+        active_flatline = self.get_active_flatline()
         if active_flatline is None:
             return
         active_flatline.close()
@@ -91,7 +91,7 @@ class Heart(db.Model):
         current_user = users.get_current_user()
         self.last_closed_reason = "Deactivated by " + current_user.nickname()
 
-        active_flatline = self.getActiveFlatline()
+        active_flatline = self.get_active_flatline()
         if active_flatline is None:
             return
         active_flatline.close()
