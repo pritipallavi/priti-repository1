@@ -4,7 +4,8 @@ import unittest
 from google.appengine.ext import db
 from google.appengine.ext import testbed
 from google.appengine.datastore import datastore_stub_util
-from datetime import datetime
+from datetime import datetime, timedelta
+from pytz.gae import pytz
 
 class HeartTestCase(unittest.TestCase):
 
@@ -24,6 +25,7 @@ class HeartTestCase(unittest.TestCase):
 	def test_check_creates_flatline_for_configured(self):
 		heart = self.org.get_heart('Test')
 		heart.cron = "* * * * *"
+		heart.last_pulse = datetime( 1980, 5, 4, 15, 40 )
 		heart.threshold = 1
 
 		flatlineBeforeCheck = heart.get_active_flatline()
@@ -32,6 +34,18 @@ class HeartTestCase(unittest.TestCase):
 
 		self.assertIsNone(flatlineBeforeCheck)
 		self.assertIsNotNone(flatlineAfterCheck)
+
+	def test_check_creates_no_flatline_for_configured_without_last_pulse(self):
+		heart = self.org.get_heart('Test')
+		heart.cron = "* * * * *"
+		heart.threshold = 1
+
+		flatlineBeforeCheck = heart.get_active_flatline()
+		heart.check_flatLine()
+		flatlineAfterCheck = heart.get_active_flatline()
+
+		self.assertIsNone(flatlineBeforeCheck)
+		self.assertIsNone(flatlineAfterCheck)
 
 	def test_check_leaves_no_flatline_for_unconfigured(self):
 		heart = self.org.get_heart('Test')
@@ -56,6 +70,65 @@ class HeartTestCase(unittest.TestCase):
 
 		self.assertIsNone(flatlineBeforeCheck)
 		self.assertIsNone(flatlineAfterCheck)
+
+	def test_is_not_flatlined_having_no_pulse_within_one_day_and_one_day_threshold(self):
+		heart = self.org.get_heart('Test')
+		heart.last_pulse = datetime.now() - timedelta(days=1, minutes=1)
+		heart.cron = heart.last_pulse.strftime( "%M %H" ) + " * * *"
+		heart.threshold = int(timedelta(days=1).total_seconds())
+
+		self.assertFalse(heart.is_flatlined())
+
+	def test_is_not_flatlined_when_1day_threshold_makes_next_date_overlap(self):
+		heart = self.org.get_heart('Test')
+		heart.last_pulse = datetime.now() - timedelta(days=2, minutes=1)
+		heart.cron = heart.last_pulse.strftime( "%M %H" ) + " * * *"
+		heart.threshold = int(timedelta(days=1).total_seconds())
+
+		self.assertFalse(heart.is_flatlined())
+
+	def test_is_not_flatlined_when_2h_threshold_makes_next_date_overlap(self):
+		heart = self.org.get_heart('Test')
+		heart.last_pulse = datetime.now() - timedelta(hours=2, minutes=1)
+		heart.cron = "0 * * * *"
+		heart.threshold = int(timedelta(hours=1).total_seconds())
+
+		self.assertFalse(heart.is_flatlined())
+
+	def test_next_expected_pulse_for_daily_midnight_schedule_is_next_midnight(self):
+		heart = self.org.get_heart('Test')
+		heart.last_pulse = datetime(1980, 5, 4, 15, 40)
+		heart.cron = "0 0 * * *"
+
+		(next_date, next_next_date) = heart.get_next_local_pulse_dates()
+		self.assertEqual( pytz.utc.localize( datetime( 1980, 5, 5, 0, 0 ) ), next_date )
+		self.assertEqual( pytz.utc.localize( datetime( 1980, 5, 6, 0, 0 ) ), next_next_date )
+
+	def test_next_expected_pulse_for_every_hour_schedule_is_next_hour(self):
+		heart = self.org.get_heart('Test')
+		heart.last_pulse = datetime(1980, 5, 4, 15, 40)
+		heart.cron = "0 * * * *"
+
+		(next_date, next_next_date) = heart.get_next_local_pulse_dates()
+		self.assertEqual( pytz.utc.localize( datetime( 1980, 5, 4, 16, 0 ) ), next_date )
+		self.assertEqual( pytz.utc.localize( datetime( 1980, 5, 4, 17, 0 ) ), next_next_date )
+
+	def test_next_expected_pulse_returns_localized_with_heart_tz(self):
+		us_eastern = pytz.timezone("US/Eastern")
+		local_last_pulse   = us_eastern.localize( datetime( 1980, 5, 4, 15, 40 ) )
+		expected_next      = us_eastern.localize( datetime( 1980, 5, 4, 16, 0  ) )
+		expected_next_next = us_eastern.localize( datetime( 1980, 5, 4, 17, 0  ) )
+
+		heart = self.org.get_heart('Test')
+		heart.last_pulse = local_last_pulse.astimezone(pytz.utc)
+		heart.cron = "0 * * * *"
+		heart.time_zone = "US/Eastern"
+
+		(next_date, next_next_date) = heart.get_next_local_pulse_dates()
+
+		self.assertEqual( expected_next, next_date )
+		self.assertEqual( expected_next_next, next_next_date )
+
 
 if __name__ == '__main__':
     unittest.main()

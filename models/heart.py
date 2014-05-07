@@ -20,7 +20,7 @@ class Heart(db.Model):
         flatline = self.get_active_flatline()
         if flatline is not None:
             flatline.resuscitate()
-        self.last_pulse = datetime.now()
+        self.last_pulse = datetime.utcnow()
         self.put()
 
     def get_active_flatline(self):
@@ -45,30 +45,42 @@ class Heart(db.Model):
         if self.cron == '':
             return self.last_pulse + timedelta(seconds=self.threshold*2) < datetime.utcnow()
 
-        if self.time_zone is None:
-            self.time_zone = 'UTC'
-
-        local_time_zone = pytz.timezone(self.time_zone)
-
         # return false if today is maintenance day
         if self.maintenance_day is not None and self.maintenance_day.strftime('%Y-%m-%d') == local_time_zone.localize(datetime.utcnow()).strftime('%Y-%m-%d'):
             return False
 
         offset = timedelta(seconds=self.threshold)
+        tznow = self.tznow()
 
-        last_pulse_local = pytz.utc.localize(self.last_pulse).astimezone(local_time_zone)
-        next_date = croniter(self.cron, last_pulse_local).get_next(datetime)
-        next_date = local_time_zone.localize(next_date)
-        next_next_date = croniter(self.cron, next_date).get_next(datetime)
-        next_date = next_date.astimezone(pytz.utc)
-        next_next_date = local_time_zone.localize(next_next_date).astimezone(pytz.utc)
-        now = pytz.utc.localize(datetime.now())
+        (next_date, next_next_date) = self.get_next_local_pulse_dates()
 
         # flatline if next_date and last_pulse are outside offset 
-        if abs((next_date - last_pulse_local).total_seconds()) < self.threshold:
-            return next_next_date + offset < now
+        if abs((next_date - self.localized_last_pulse()).total_seconds()) < self.threshold:
+            return next_next_date + offset < tznow
 
-        return  next_date + offset < now
+        return  next_date + offset < tznow
+
+    def localized_last_pulse(self):
+        # Make sure last is native datetime to avoid ValueError, 'Not naive datetime (tzinfo is already set)
+        last = self.last_pulse.replace(tzinfo=None)
+        return pytz.utc.localize(last).astimezone(self.tz())
+
+    def tz(self):
+        return pytz.timezone(self.time_zone or 'UTC')
+
+    def tznow(self):
+        return pytz.utc.localize(datetime.utcnow()).astimezone(self.tz())
+
+    def get_next_local_pulse_dates(self):
+        local_time_zone = self.tz()
+        
+        next_date = croniter(self.cron, self.localized_last_pulse()).get_next(datetime)
+        next_date = local_time_zone.localize(next_date)
+
+        next_next_date = croniter(self.cron, next_date).get_next(datetime)
+        next_next_date = local_time_zone.localize(next_next_date)
+
+        return next_date, next_next_date
 
     def check_maintenance(self):
         # Clear active flatline if today is maintenance day
