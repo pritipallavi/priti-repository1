@@ -54,8 +54,10 @@ class OrganizationHandler(webapp2.RequestHandler):
 
 class SummaryHandler(webapp2.RequestHandler):
     def get(self):
-        id = int(self.request.url.rsplit('/', 1)[1])
-        org = Organization.get_by_id(id)
+        org_id = self.request.url.rsplit('/', 1)[1]
+        if not org_id.isdigit():
+            self.abort(404)
+        org = Organization.get_by_id(int(org_id))
         if org is None:
             self.abort(404)
         newhearts = Heart.all().ancestor(org.key()).filter('title =', '').fetch(2000)
