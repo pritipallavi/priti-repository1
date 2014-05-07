@@ -56,6 +56,8 @@ class SummaryHandler(webapp2.RequestHandler):
     def get(self):
         id = int(self.request.url.rsplit('/', 1)[1])
         org = Organization.get_by_id(id)
+        if org is None:
+            self.abort(404)
         newhearts = Heart.all().ancestor(org.key()).filter('title =', '').fetch(2000)
         maintenancehearts = Heart.all().ancestor(org.key()).filter('maintenance_day !=', None).order('-maintenance_day').fetch(2000)
         flatlines = Flatline.all().filter("active =", True).fetch(2000)
