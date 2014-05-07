@@ -2,6 +2,7 @@
 import optparse
 import sys
 import unittest
+import os
 
 USAGE = """%prog SDK_PATH TEST_PATH
 Run unit tests for App Engine apps.
@@ -17,6 +18,9 @@ def main(sdk_path):
     suite = unittest.loader.TestLoader().discover('tests', '*.py')
     unittest.TextTestRunner(verbosity=2).run(suite)
 
+# Mimic GAE runtime and set timezone for the current process to UTC:
+# http://timezones.appspot.com/
+os.environ['TZ'] = "UTC"
 
 if __name__ == '__main__':
     parser = optparse.OptionParser(USAGE)
