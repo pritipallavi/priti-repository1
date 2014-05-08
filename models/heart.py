@@ -41,7 +41,7 @@ class Heart(db.Model):
         f.put()
         flatline_mail(self)
 
-    def is_flatlined(self):
+    def is_flatlined(self, utcnow=None):
         if self.cron == '':
             return self.last_pulse + timedelta(seconds=self.threshold*2) < datetime.utcnow()
 
@@ -50,7 +50,10 @@ class Heart(db.Model):
             return False
 
         offset = timedelta(seconds=self.threshold)
-        tznow = self.tznow()
+        if utcnow is not None:
+            tznow = pytz.utc.localize(utcnow.replace(tzinfo=None)).astimezone(self.tz())
+        else:
+            tznow = self.tznow()
 
         (next_date, next_next_date) = self.get_next_local_pulse_dates()
 
@@ -72,6 +75,9 @@ class Heart(db.Model):
         return pytz.utc.localize(datetime.utcnow()).astimezone(self.tz())
 
     def get_next_local_pulse_dates(self):
+        if self.cron == '':
+            return ( None, None )
+
         local_time_zone = self.tz()
         
         next_date = croniter(self.cron, self.localized_last_pulse()).get_next(datetime)
@@ -81,6 +87,19 @@ class Heart(db.Model):
         next_next_date = local_time_zone.localize(next_next_date)
 
         return next_date, next_next_date
+
+    def calculate_next_flatline(self):
+        (next_date, next_next_date) = self.get_next_local_pulse_dates()
+        if next_date is None:
+            return
+        next_date_plus_threshold = next_date + timedelta(seconds=self.threshold)
+        next_next_date_minus_threshold = next_next_date - timedelta(seconds=self.threshold)
+        next_next_date_plus_threshold = next_next_date + timedelta(seconds=self.threshold)
+        
+        threshold_end = next_next_date_plus_threshold if next_date_plus_threshold > next_next_date_minus_threshold else next_date_plus_threshold
+        flatline = threshold_end + timedelta(microseconds=1)
+
+        return flatline.astimezone(pytz.utc)
 
     def check_maintenance(self):
         # Clear active flatline if today is maintenance day

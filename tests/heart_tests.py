@@ -129,6 +129,42 @@ class HeartTestCase(unittest.TestCase):
 		self.assertEqual( expected_next, next_date )
 		self.assertEqual( expected_next_next, next_next_date )
 
+	def test_calculate_flatline_with_every_hour_schedule_1h_overlapping_threshold(self):
+		us_eastern = pytz.timezone("US/Eastern")
+		local_last_pulse  = us_eastern.localize( datetime( 1980, 5, 4, 15, 40 ) )
+		# next pulse should be at 16:00 and flatline at 17:00, but will flatline at 18:00 due 
+		# to a threshold that overlaps the periodicity of the cron schedule
+		expected_flatline = us_eastern.localize( datetime( 1980, 5, 4, 18, 0  ) ) + timedelta(microseconds=1)
+
+		heart = self.org.get_heart('Test')
+		heart.last_pulse = local_last_pulse.astimezone(pytz.utc)
+		heart.cron = "0 * * * *"
+		heart.threshold = int(timedelta(hours=1).total_seconds())
+		heart.time_zone = "US/Eastern"
+
+		next_flatline = heart.calculate_next_flatline()
+
+		self.assertEqual( expected_flatline, next_flatline )
+		# self check
+		utcnow = expected_flatline.astimezone(pytz.utc)
+		self.assertTrue( heart.is_flatlined( utcnow ) )
+
+	def test_calculate_flatline_with_every_5min_schedule_30min_threshold(self):
+		heart = self.org.get_heart('Test')
+		heart.cron = "*/5 * * * *"
+		heart.threshold = int(timedelta(minutes=30).total_seconds())
+		heart.timezone = "UTC"
+		# last pulse 15:38; next pulse expected at 15:45 + 30 min threshold = flatlines after 16:15
+		heart.last_pulse = datetime(1980, 5, 4, 15, 38)
+		expected_flatline = pytz.utc.localize( datetime( 1980, 5, 4, 16, 15 ) + timedelta(microseconds=1) )
+
+		next_flatline = heart.calculate_next_flatline()
+
+		self.assertEqual( expected_flatline, next_flatline )
+		# self check
+		utcnow = expected_flatline.astimezone(pytz.utc)
+		self.assertTrue( heart.is_flatlined( utcnow ) )
+
 
 if __name__ == '__main__':
     unittest.main()
