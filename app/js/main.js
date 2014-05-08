@@ -170,10 +170,9 @@ function OrganCtrl ($scope, $http, $routeParams) {
 function HeartCtrl ($scope, $http, $routeParams) {
 
     $scope.updateScheduleInfo = function  () {
-        var pulse_moment = moment.utc($scope.last_pulse);
-        $scope.last_pulse_text = pulse_moment.fromNow();
         try{
-            $scope.cron_guess = prettyCron.getNext($scope.cron);
+            var next_moment = moment.tz( moment( prettyCron.getNextDate($scope.cron) ).tz('UTC').format('YYYY-MM-DD HH:mm:ss'), $scope.time_zone );
+            $scope.cron_guess = $scope.cron == '' ? 'No cron schedule given' : 'Next heartbeat is expected at: ' + next_moment.format( 'YYYY-MM-DD HH:mm Z') + ' (' + next_moment.fromNow() + ')';
             $scope.cron_schedule_text = prettyCron.toString($scope.cron);
             if( new Date($scope.maintenance_day).setHours(0,0,0,0) === new Date().setHours(0,0,0,0) ) {
                 $scope.today_is_maintenance_day = moment($scope.maintenance_day).format("[Important! Today,] YYYY-MM-DD[, is maintenance day]");
@@ -199,13 +198,30 @@ function HeartCtrl ($scope, $http, $routeParams) {
             $scope.last_closed_by = result.last_closed_by;
             $scope.time_zone = result.time_zone;
             $scope.maintenance_day = result.maintenance_day;
+            $scope.flatline_guess_text = result.cron == '' ? 'No cron schedule given' : 
+                moment.utc(result.calculated_flatline).tz($scope.time_zone).format(
+                    '[If no heartbeat is recorded before] ' + 
+                    'YYYY-MM-DD HH:mm Z' + 
+                    '[ (' + moment.utc(result.calculated_flatline).tz($scope.time_zone).fromNow() + ')]' +
+                    '[, a flatline will be created and alerts will be sent.]');
             $scope.updateScheduleInfo();
+            var pulse_moment = moment.utc($scope.last_pulse);
+            $scope.last_pulse_text = pulse_moment.fromNow();
             $scope.flatlines = result.flatlines.map(function(f) {
-                f.duration = f.end != 'None' ? moment(f.end).from(moment(f.start), true) : 'On going';
-                f.start = moment.utc(f.start).local().format('YYYY-MM-DD HH:mm');
-                if(f.end != 'None'){
-                    f.end = moment.utc(f.end).local().format('YYYY-MM-DD HH:mm');
+                var start_moment = moment.utc(f.start).local();
+                var end = f.end;
+
+                if( end === 'None' ) {
+                    f.duration = 'On going';
+                    f.end = '-';
+                    $scope.flatline_text = '';
+                } else {
+                    f.duration = moment(f.end).from(moment(f.start), true);
+                    f.end = moment.utc(f.end).local().format('YYYY-MM-DD HH:mm Z');
                 }
+
+                f.start = start_moment.format('YYYY-MM-DD HH:mm Z');
+
                 return f;
             });
             $scope.error = false;
