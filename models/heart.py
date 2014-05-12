@@ -46,7 +46,7 @@ class Heart(db.Model):
             return self.last_pulse + timedelta(seconds=self.threshold*2) < datetime.utcnow()
 
         # return false if today is maintenance day
-        if self.maintenance_day is not None and self.maintenance_day.strftime('%Y-%m-%d') == local_time_zone.localize(datetime.utcnow()).strftime('%Y-%m-%d'):
+        if self.maintenance_day is not None and self.maintenance_day.strftime('%Y-%m-%d') == self.tznow().strftime('%Y-%m-%d'):
             return False
 
         offset = timedelta(seconds=self.threshold)

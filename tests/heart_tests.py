@@ -35,6 +35,20 @@ class HeartTestCase(unittest.TestCase):
 		self.assertIsNone(flatlineBeforeCheck)
 		self.assertIsNotNone(flatlineAfterCheck)
 
+	def test_check_creates_no_flatline_for_heart_marked_for_maintenance(self):
+		heart = self.org.get_heart('Test')
+		heart.cron = "* * * * *"
+		heart.last_pulse = datetime( 1980, 5, 4, 15, 40 )
+		heart.maintenance_day = datetime.utcnow().date()
+		heart.threshold = 1
+
+		flatlineBeforeCheck = heart.get_active_flatline()
+		heart.check_flatLine()
+		flatlineAfterCheck = heart.get_active_flatline()
+
+		self.assertIsNone(flatlineBeforeCheck)
+		self.assertIsNone(flatlineAfterCheck)
+
 	def test_check_creates_no_flatline_for_configured_without_last_pulse(self):
 		heart = self.org.get_heart('Test')
 		heart.cron = "* * * * *"
