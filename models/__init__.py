@@ -1,6 +1,9 @@
 from google.appengine.api import mail
 from lib.pubnub import pubnub
 
+__publish_key__ = 'publish key'
+__subscription_key__ = 'subscription key'
+__secret_key__ = 'secret key'
 
 def resuscitate_mail(heart):
     message = mail.EmailMessage(sender="alerts@heartrate-monitor.appspotmail.com",
@@ -31,9 +34,9 @@ def resuscitate_mail(heart):
 
     try:
         pub = pubnub.Pubnub(
-            'publish key',
-            'subscription key',
-            'secret',
+            __publish_key__,
+            __subscription_key__,
+            __secret_key__,
             False)
         pub.publish({
             'channel': 'remotex-alerts',
@@ -80,9 +83,9 @@ def flatline_mail(heart):
         pass
     try:
         pub = pubnub.Pubnub(
-            "pub-c-1f0c3356-d4c4-42ac-a84e-27d39e781b85",
-            "sub-c-c8c9e356-df06-11e2-95e6-02ee2ddab7fe",
-            'sec-c-ZTAyYTY2ZDItNzY2ZS00YmMzLTk0MjItNTk1ODRjZjU3ZTY2',
+            __publish_key__,
+            __subscription_key__,
+            __secret_key__,
             False)
         pub.publish({
             'channel': 'remotex-alerts',
