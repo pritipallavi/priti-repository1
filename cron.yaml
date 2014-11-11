@@ -2,3 +2,7 @@ cron:
 - description: check for flatlines
   url: /checkforflatlines
   schedule: every 5 minutes
+
+- description: sends weekly reports
+  url: /sendreports
+  schedule: every friday 09:00
