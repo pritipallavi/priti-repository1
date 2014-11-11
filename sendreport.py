@@ -24,7 +24,7 @@ def send_report(org, rangestart):
     Here is the weekly report of how your hearts are doing.
 
     Availablility: """+str(availablility)+"""
-    Downtime: """+str(downtime)+"""
+    Downtime: """+str(downtime)+""" seconds
     Flatlines: """+str(len(oldflatlines))+"""
 
     Details for 7 days backwards can be found here:
