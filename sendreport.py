@@ -25,7 +25,7 @@ def send_report(org, rangestart):
 
     Availablility: """+str(availablility)+"""
     Downtime: """+str(downtime)+"""
-    Flatlines: """+str(oldflatlines.__len__)+"""
+    Flatlines: """+str(len(oldflatlines))+"""
 
     Details for 7 days backwards can be found here:
     https://heartrate-monitor.appspot.com/app/organizations/"""+str(org.key().id())+"""/report
