@@ -26,6 +26,10 @@ handlers:
   script: pulse.app
   login: admin
 
+- url: /sendreports
+  script: sendreport.app
+  login: admin
+
 - url: /css
   static_dir: landing/css
 
